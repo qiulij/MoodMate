@@ -4,12 +4,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
+//
 public class DatabaseConnection {
 
     private static final String DB_URL = "jdbc:mysql://localhost:3306/moodMate";
     private static final String DB_USER = "root"; // Replace with your MySQL username
-    private static final String DB_PASSWORD = "mahsa@62472"; // Replace with your MySQL password
+    private static final String DB_PASSWORD = "002915"; // Replace with your MySQL password
 
     // Method to get a database connection
     public static Connection getConnection() throws SQLException {
@@ -31,3 +31,4 @@ public class DatabaseConnection {
         }
     }
 }
+
