@@ -1,12 +1,8 @@
-;(assert (dimension-score (dimension "EI") (score 1) (strength 50)))
-;(assert (dimension-score (dimension "SN") (score 1) (strength 90)))
-;(assert (dimension-score (dimension "TF") (score 1) (strength 65)))
-;(assert (dimension-score (dimension "JP") (score -1) (strength 70)))
-
-
 (assert (user-input (username "john") (password "pass123")))
 (assert (profile-input (user_id 1) (name "Alice") (gender 1)
-                       (age 25) (mbti "unknown") (hobbies (create$ "reading" "hiking"))))
+                       (age 25) (mbti "unknown") (hobbies (create$ "reading" "hiking"))
+                       (notification-frequency 2))) ;; Notifications every 2 hours
+
 (assert (mbti-answer (user_id 1) (dimension "EI") (question_id 1) (score 3)))
 (assert (mbti-answer (user_id 1) (dimension "EI") (question_id 2) (score -2)))
 (assert (mbti-answer (user_id 1) (dimension "SN") (question_id 1) (score 4)))
