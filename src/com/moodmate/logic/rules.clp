@@ -1,4 +1,3 @@
-; Rule to validate username and password
 (defrule check-valid-username-and-password
     (user-input (username ?u) (password ?p))
     (test (neq ?u ""))
@@ -7,7 +6,6 @@
 =>
     (assert (validation-result (valid TRUE) (message "Validation successful!"))))
 
-; Rule to find invalidate username or password
 (defrule invalid-username-or-password
     (user-input (username ?u) (password ?p))
     (or (test (eq ?u ""))
@@ -16,109 +14,94 @@
 =>
     (assert (validation-result (valid FALSE) (message "Invalid input: Username and password must not be the same or empty!"))))
 
-; Rules for name validation
-(defrule validate-name
-    (profile-input (name ?n))
-    (test (and (> (str-length ?n) 0) 
-               (< (str-length ?n) 50)))
-=>
-    (assert (validation-result (valid TRUE) 
-            (message "Name validation passed"))))
-
-(defrule invalid-name
-    (profile-input (name ?n))
-    (or (test (<= (str-length ?n) 0))
-        (test (>= (str-length ?n) 50)))
-=>
-    (assert (validation-result (valid FALSE) 
-            (message "Name must be between 1 and 50 characters"))))
-
-; Rule for MBTI validation
-(defrule validate-mbti
-    (profile-input (mbti ?m))
-    (test (member$ ?m (create$ "INTJ" "INTP" "ENTJ" "ENTP" 
-                              "INFJ" "INFP" "ENFJ" "ENFP" 
-                              "ISTJ" "ISFJ" "ESTJ" "ESFJ" 
-                              "ISTP" "ISFP" "ESTP" "ESFP"
-                              "unknown")))
-=>
-    (assert (validation-result (valid TRUE) (message "Valid MBTI type"))))
-
-; Rule to validate self-image score
-(defrule validate-self-image
-    (profile-input (self-image-score ?s))
-    (test (and (>= ?s 1.0) (<= ?s 10.0)))
-=>
-    (assert (validation-result (valid TRUE) (message "Self-image score validation passed"))))
-
-; Rule to check for invalid data
-(defrule invalid-profile-data
-    (profile-input (name ?n) (age ?a) (gender ?g) (mbti ?m) (self-image-score ?s))
-    (or (test (<= (str-length ?n) 0))
-        (test (>= (str-length ?n) 50))
-        (test (< ?a 13))
-        (test (> ?a 100))
-        (test (< ?g 0))
-        (test (> ?g 2))
-        (test (< ?s 1.0))
-        (test (> ?s 10.0)))
-=>
-    (assert (validation-result (valid FALSE) (message "Invalid profile data provided!"))))
-
-; Calculate dimension scores with strength
-(defrule calculate-dimension-score
-    ;; Get values for a specific dimension
-    (mbti-answer (dimension ?d) (value ?v))
-=>
-    ; Convert to percentage (-5 to 5 scale to 0-100%)
-    (bind ?strength (* (abs (/ ?v 5)) 100))
-    
-    ; Score is positive or negative based on value
-    (assert (dimension-score 
-        (dimension ?d)
-        (score (if (> ?v 0) then 1 else -1))
-        (strength ?strength)))
-    
-)
-
-; Determine MBTI type with confidence levels
-(defrule determine-mbti-type
-    (dimension-score (dimension "EI") (score ?ei) (strength ?ei-str))
-    (dimension-score (dimension "SN") (score ?sn) (strength ?sn-str))
-    (dimension-score (dimension "TF") (score ?tf) (strength ?tf-str))
-    (dimension-score (dimension "JP") (score ?jp) (strength ?jp-str))
-    =>
-    (bind ?type "")
-    ; Build MBTI type with strength indicators
-    (bind ?type (str-cat ?type 
-        (if (> ?ei 0) then "E" else "I") "(" (round ?ei-str) "%) "))
-    (bind ?type (str-cat ?type 
-        (if (> ?sn 0) then "S" else "N") "(" (round ?sn-str) "%) "))
-    (bind ?type (str-cat ?type 
-        (if (> ?tf 0) then "T" else "F") "(" (round ?tf-str) "%) "))
-    (bind ?type (str-cat ?type 
-        (if (> ?jp 0) then "J" else "P") "(" (round ?jp-str) "%) "))
-    
-    ; Assert result with detailed breakdown
-    (assert (mbti-result 
-        (type (str-cat 
-            (if (> ?ei 0) then "E" else "I")
-            (if (> ?sn 0) then "S" else "N")
-            (if (> ?tf 0) then "T" else "F")
-            (if (> ?jp 0) then "J" else "P")))
-        (details ?type)))
-)
-
-; Rule to print validation results
 (defrule print-validation-result
-    (validation-result (valid ?v) (message ?m))
+    ?result <- (validation-result (valid ?valid) (message ?message))
 =>
-    (printout t "Validation Result: " ?m crlf))
+    (printout t ?message crlf)
+    (retract ?result)) ;; Retract after printing to avoid duplicate messages
 
-; Rule to print MBTI results
-(defrule print-mbti-result
-    (mbti-result (type ?t) (details ?d))
+(defrule initialize-profile
+   (profile-input (user_id ?id) (name ?name))
+   (not (profile-result (user_id ?id))) ;; Only initialize if it doesn't already exist
 =>
-    (printout t "MBTI Type: " ?t crlf)
-)
-    
+   (assert (profile-result (user_id ?id) (mbti nil) (self-image-score nil)))
+   (printout t "Profile initialized for user: " ?name crlf))
+
+(defrule validate-profile-basic
+	(declare (salience 100))
+    ?input <- (profile-input (name ?name) (age ?age) (gender ?gender))
+    (test (neq ?name "")) ;; Name must not be empty
+    (test (> ?age 0))     ;; Age must be a positive number
+    (test (<= ?age 120))  ;; Age should be realistic
+    (test (or (eq ?gender 0) (eq ?gender 1) (eq ?gender 2))) ;; Valid gender
+=>
+    (printout t "Basic profile validated successfully for user: " ?name crlf))
+
+(defrule check-mbti
+    ?input <- (profile-input (user_id ?id) (name ?name) (mbti ?mbti))
+    (test (member$ ?mbti (create$ "INTJ" "ENTJ" "INFJ" "ENFJ" 
+                                  "INTP" "ENTP" "INFP" "ENFP" 
+                                  "ISTJ" "ESTJ" "ISFJ" "ESFJ" 
+                                  "ISTP" "ESTP" "ISFP" "ESFP" "unknown")))
+=>
+    (if (eq ?mbti "unknown") 
+        then (printout t "MBTI is unknown for user: " ?name ". Assigning test for MBTI classification." crlf))
+    (if (neq ?mbti "unknown") 
+        then (printout t "MBTI provided for user: " ?name " is valid: " ?mbti crlf)))
+
+
+(defrule calculate-mbti
+   (declare (salience 80))
+   ?profile <- (profile-result (user_id ?id) (mbti nil))
+   (mbti-answer (user_id ?id) (dimension "EI") (question_id 1) (score ?q1))
+   (mbti-answer (user_id ?id) (dimension "EI") (question_id 2) (score ?q2))
+   (mbti-answer (user_id ?id) (dimension "SN") (question_id 1) (score ?q3))
+   (mbti-answer (user_id ?id) (dimension "SN") (question_id 2) (score ?q4))
+   (mbti-answer (user_id ?id) (dimension "TF") (question_id 1) (score ?q5))
+   (mbti-answer (user_id ?id) (dimension "TF") (question_id 2) (score ?q6))
+   (mbti-answer (user_id ?id) (dimension "JP") (question_id 1) (score ?q7))
+   (mbti-answer (user_id ?id) (dimension "JP") (question_id 2) (score ?q8))
+=>
+   (bind ?EI (if (> (+ ?q1 ?q2) 0) then "E" else "I"))
+   (bind ?SN (if (> (+ ?q3 ?q4) 0) then "S" else "N"))
+   (bind ?TF (if (> (+ ?q5 ?q6) 0) then "T" else "F"))
+   (bind ?JP (if (> (+ ?q7 ?q8) 0) then "J" else "P"))
+   (bind ?mbti (str-cat ?EI ?SN ?TF ?JP))
+   (modify ?profile (mbti ?mbti))
+   (printout t "Calculated MBTI for user " ?id ": " ?mbti crlf))
+
+(defrule calculate-self-image-score
+   (declare (salience 70))
+   ?profile <- (profile-result (user_id ?id) (self-image-score nil))
+   (self-image-answer (user_id ?id) (question_id 1) (answer ?a1))
+   (self-image-answer (user_id ?id) (question_id 2) (answer ?a2))
+   (self-image-answer (user_id ?id) (question_id 3) (answer ?a3))
+   (self-image-answer (user_id ?id) (question_id 4) (answer ?a4))
+   (self-image-answer (user_id ?id) (question_id 5) (answer ?a5))
+   (self-image-answer (user_id ?id) (question_id 6) (answer ?a6))
+   (self-image-answer (user_id ?id) (question_id 7) (answer ?a7))
+   (self-image-answer (user_id ?id) (question_id 8) (answer ?a8))
+   (self-image-answer (user_id ?id) (question_id 9) (answer ?a9))
+   (self-image-answer (user_id ?id) (question_id 10) (answer ?a10))
+=>
+   (bind ?score (+ ?a1 
+                   (- 5 ?a2) 
+                   ?a3 
+                   ?a4 
+                   (- 5 ?a5) 
+                   (- 5 ?a6) 
+                   ?a7 
+                   (- 5 ?a8) 
+                   (- 5 ?a9) 
+                   ?a10))
+   (modify ?profile (self-image-score ?score))
+   (printout t "Calculated self-image score for user " ?id ": " ?score crlf))
+
+
+(defrule print-profile
+   (declare (salience 50))
+   (profile-result (user_id ?id) (mbti ?mbti&:(neq ?mbti nil)) (self-image-score ?score&:(neq ?score nil)))
+=>
+   (printout t "User Profile for ID: " ?id crlf
+             "MBTI: " ?mbti crlf
+             "Self-Image Score: " ?score crlf))

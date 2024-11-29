@@ -16,7 +16,7 @@ public class Main {
 			Rete r = new Rete();
 			
 //			r.eval("(watch facts)");
-			r.eval("(watch rules)");
+//			r.eval("(watch rules)");
 			r.eval("(reset)");
 			
 			r.eval("(batch " + file1 + ")");
