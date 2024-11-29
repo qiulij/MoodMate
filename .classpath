@@ -16,13 +16,6 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/qiuli/Downloads/firebase-admin-java-master.zip"/>
-	<classpathentry kind="lib" path="C:/Users/qiuli/Downloads/firebase-admin-8.1.0.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/qiuli/Downloads/mysql-connector-j-9.1.0.zip"/>
 	<classpathentry kind="lib" path="C:/Users/qiuli/Downloads/mysql-connector-j-9.1.0/mysql-connector-j-9.1.0/mysql-connector-j-9.1.0.jar">
 		<attributes>
 			<attribute name="module" value="true"/>
