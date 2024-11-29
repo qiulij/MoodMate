@@ -6,59 +6,61 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Stack;
 
 public abstract class BasePage extends JFrame {
     // Constants for layout sizes
-    private static final int FRAME_WIDTH = 360; // Width of the main frame
-    private static final int FRAME_HEIGHT = 780; // Height of the main frame
-
-    private static final int STATUS_ICON_SIZE = 15; // Size of status bar icons
-
-    // Constants for bar heights
+    private static final int FRAME_WIDTH = 360;
+    private static final int FRAME_HEIGHT = 780;
+    private static final int STATUS_ICON_SIZE = 15;
     private static final int STATUS_BAR_HEIGHT = 30;
     private static final int NAV_BAR_HEIGHT = 30;
+    private static final int TOP_PANEL_HEIGHT = 40;
+    private static final int ICON_SIZE = 20;
+    private static final int MENU_BAR_WIDTH = 200;
 
-    // Constants for top panel dimensions
-    private static final int TOP_PANEL_HEIGHT = 40; // Reduced height
-    private static final int ICON_SIZE = 20; // Profile icon size
+    private boolean isMenuBarOpen = false; // Track the state of the menu bar
 
-    // Constants for menu bar
-    private static final int MENU_BAR_WIDTH = 200; // Width of the sliding menu bar
+    // Navigation stack to keep track of visited pages
+    private static final Stack<BasePage> navigationStack = new Stack<>();
 
     protected JPanel statusBar;
     protected JPanel navigationBar;
-    protected JLayeredPane layeredPane; // For overlay effect
     protected JPanel contentArea;
     protected JPanel topPanel;
-    private JPanel menuBar; // Sliding menu bar
+    private JPanel menuBar;
+    private JLayeredPane layeredPane;
 
     public BasePage() {
         // Set up the main frame
-        setTitle("MoodMate - Android Look");
+        setTitle("MoodMate");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(FRAME_WIDTH, FRAME_HEIGHT); // Use constants for frame dimensions
+        setSize(FRAME_WIDTH, FRAME_HEIGHT);
         setLayout(new BorderLayout());
-        setResizable(false); // Prevent resizing
+        setResizable(false);
+
+        // -------- Container Panel for Status Bar and Top Panel --------
+        JPanel containerPanel = new JPanel();
+        containerPanel.setLayout(new BorderLayout());
+        containerPanel.setPreferredSize(new Dimension(FRAME_WIDTH, STATUS_BAR_HEIGHT + TOP_PANEL_HEIGHT));
 
         // -------- Status Bar --------
         statusBar = new JPanel();
-        statusBar.setPreferredSize(new Dimension(FRAME_WIDTH, STATUS_BAR_HEIGHT)); // Use constant for height
-        statusBar.setBackground(Color.LIGHT_GRAY); // Set a light background
+        statusBar.setPreferredSize(new Dimension(FRAME_WIDTH, STATUS_BAR_HEIGHT));
+        statusBar.setBackground(Color.LIGHT_GRAY);
         statusBar.setLayout(new BorderLayout());
+        statusBar.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // Padding
 
-        // Time Label (Left)
         JLabel timeLabel = new JLabel();
-        timeLabel.setForeground(Color.BLACK);
         timeLabel.setFont(new Font("Helvetica Neue", Font.PLAIN, 12));
-        timeLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        Timer timer = new Timer(1000, e -> timeLabel.setText(getCurrentTime()));
+        timer.start();
         statusBar.add(timeLabel, BorderLayout.WEST);
 
-        // Icons Panel (Right)
         JPanel iconPanel = new JPanel();
         iconPanel.setLayout(new BoxLayout(iconPanel, BoxLayout.X_AXIS));
         iconPanel.setBackground(Color.LIGHT_GRAY);
 
-        // Add icons with resizing
         iconPanel.add(resizeIcon("assets/images/wifi.png", STATUS_ICON_SIZE, STATUS_ICON_SIZE));
         iconPanel.add(Box.createHorizontalStrut(5));
         iconPanel.add(resizeIcon("assets/images/bluetooth.png", STATUS_ICON_SIZE, STATUS_ICON_SIZE));
@@ -69,110 +71,175 @@ public abstract class BasePage extends JFrame {
 
         statusBar.add(iconPanel, BorderLayout.EAST);
 
-        // Timer to update time
-        Timer timer = new Timer(1000, e -> timeLabel.setText(getCurrentTime()));
-        timer.start();
+        // Add the statusBar to the containerPanel
+        containerPanel.add(statusBar, BorderLayout.NORTH);
 
         // -------- Top Panel --------
         topPanel = new JPanel(new BorderLayout());
-        topPanel.setPreferredSize(new Dimension(FRAME_WIDTH, TOP_PANEL_HEIGHT)); // Reduced height
+        topPanel.setPreferredSize(new Dimension(FRAME_WIDTH, TOP_PANEL_HEIGHT));
         topPanel.setBackground(Color.WHITE);
-        topPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10)); // Padding: 10px left and right
+        topPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
 
         // Add Logo (Left)
-        JLabel logoLabel = resizeIconMaintainAspect("assets/images/logo.png", ICON_SIZE); // Dynamically resize
-        topPanel.add(logoLabel, BorderLayout.WEST);
+        JLabel logoLabel = resizeIconMaintainAspect("assets/images/logo.png", ICON_SIZE);
+        if (logoLabel != null) {
+            topPanel.add(logoLabel, BorderLayout.WEST);
+        } else {
+            System.out.println("Logo image not found: assets/images/logo.png");
+        }
 
         // Add Profile Icon (Right) with Menu Action
         JLabel profileIcon = resizeIcon("assets/images/profile.png", ICON_SIZE, ICON_SIZE);
-        profileIcon.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        profileIcon.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                toggleMenuBar();
-            }
-        });
-        topPanel.add(profileIcon, BorderLayout.EAST);
+        if (profileIcon != null) {
+            profileIcon.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            profileIcon.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    toggleMenuBar(); // Trigger sidebar toggle on click
+                }
+            });
+            topPanel.add(profileIcon, BorderLayout.EAST);
+        } else {
+            System.out.println("Profile icon image not found: assets/images/profile.png");
+        }
 
-        // -------- Container Panel --------
-        JPanel containerPanel = new JPanel();
-        containerPanel.setLayout(new BorderLayout());
-        containerPanel.setPreferredSize(new Dimension(FRAME_WIDTH, STATUS_BAR_HEIGHT + TOP_PANEL_HEIGHT));
-
-        // Add statusBar and topPanel to the container
-        containerPanel.add(statusBar, BorderLayout.NORTH);
+        // Add the topPanel to the containerPanel
         containerPanel.add(topPanel, BorderLayout.SOUTH);
 
-        // Add the container panel to the NORTH of the frame
+        // Add the containerPanel to the NORTH of the frame
         add(containerPanel, BorderLayout.NORTH);
 
         // -------- Layered Pane for Overlay --------
         layeredPane = new JLayeredPane();
-        layeredPane.setPreferredSize(new Dimension(FRAME_WIDTH, FRAME_HEIGHT - STATUS_BAR_HEIGHT - NAV_BAR_HEIGHT - TOP_PANEL_HEIGHT));
+        layeredPane.setPreferredSize(new Dimension(FRAME_WIDTH, FRAME_HEIGHT - STATUS_BAR_HEIGHT - NAV_BAR_HEIGHT));
         add(layeredPane, BorderLayout.CENTER);
 
         // -------- Content Area --------
         contentArea = new JPanel();
         contentArea.setBackground(Color.WHITE);
-        contentArea.setBounds(0, 0, FRAME_WIDTH, FRAME_HEIGHT - STATUS_BAR_HEIGHT - NAV_BAR_HEIGHT - TOP_PANEL_HEIGHT);
+        contentArea.setBounds(0, 0, FRAME_WIDTH, FRAME_HEIGHT - STATUS_BAR_HEIGHT - NAV_BAR_HEIGHT);
         contentArea.setLayout(new BorderLayout());
         layeredPane.add(contentArea, JLayeredPane.DEFAULT_LAYER);
 
         // -------- Sliding Menu Bar --------
         menuBar = new JPanel();
         menuBar.setBackground(Color.LIGHT_GRAY);
-        menuBar.setBounds(FRAME_WIDTH, 0, MENU_BAR_WIDTH, contentArea.getHeight()); // Dynamically set height
+        menuBar.setBounds(FRAME_WIDTH, 0, MENU_BAR_WIDTH, FRAME_HEIGHT - STATUS_BAR_HEIGHT - NAV_BAR_HEIGHT);
         menuBar.setLayout(new BoxLayout(menuBar, BoxLayout.Y_AXIS));
+
+        // Add some test content to the menu bar
         menuBar.add(new JLabel("Menu Item 1"));
+        menuBar.add(Box.createVerticalStrut(10)); // Spacing between items
         menuBar.add(new JLabel("Menu Item 2"));
+        menuBar.add(Box.createVerticalStrut(10));
         menuBar.add(new JLabel("Menu Item 3"));
-        layeredPane.add(menuBar, JLayeredPane.PALETTE_LAYER); // Add to the top layer
+
+        // Add the menuBar to the JLayeredPane on the PALETTE_LAYER
+        layeredPane.add(menuBar, JLayeredPane.PALETTE_LAYER);
 
         // -------- Navigation Bar --------
         navigationBar = new JPanel();
         navigationBar.setBackground(Color.LIGHT_GRAY);
-        navigationBar.setPreferredSize(new Dimension(FRAME_WIDTH, NAV_BAR_HEIGHT)); // Use constant for height
-        navigationBar.setLayout(new BoxLayout(navigationBar, BoxLayout.X_AXIS));
+        navigationBar.setPreferredSize(new Dimension(FRAME_WIDTH, NAV_BAR_HEIGHT));
+        navigationBar.setLayout(new GridBagLayout());
 
-        // Add navigation buttons
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(0, 20, 0, 20);
+
         JLabel backButton = resizeIcon("assets/images/back.png", STATUS_ICON_SIZE, STATUS_ICON_SIZE);
-        navigationBar.add(Box.createHorizontalGlue());
-        navigationBar.add(backButton);
-        navigationBar.add(Box.createHorizontalStrut(50));
+        backButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        backButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                navigateBack();
+            }
+        });
+        gbc.gridx = 0;
+        navigationBar.add(backButton, gbc);
 
         JLabel homeButton = resizeIcon("assets/images/home.png", STATUS_ICON_SIZE, STATUS_ICON_SIZE);
-        navigationBar.add(homeButton);
-        navigationBar.add(Box.createHorizontalStrut(50));
+        homeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        homeButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                navigateToHome();
+            }
+        });
+        gbc.gridx = 1;
+        navigationBar.add(homeButton, gbc);
 
         JLabel recentButton = resizeIcon("assets/images/recent.png", STATUS_ICON_SIZE, STATUS_ICON_SIZE);
-        navigationBar.add(recentButton);
-        navigationBar.add(Box.createHorizontalGlue());
+        recentButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        recentButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JOptionPane.showMessageDialog(BasePage.this, "Recent functionality coming soon!");
+            }
+        });
+        gbc.gridx = 2;
+        navigationBar.add(recentButton, gbc);
 
         add(navigationBar, BorderLayout.SOUTH);
+
+        // Revalidate and repaint
+        layeredPane.revalidate();
+        layeredPane.repaint();
+        setVisible(true);
     }
 
-    // Method to toggle menu bar visibility
     private void toggleMenuBar() {
-        int contentAreaHeight = contentArea.getHeight(); // Dynamically get content area height
+        int startX = isMenuBarOpen ? FRAME_WIDTH - MENU_BAR_WIDTH : FRAME_WIDTH;
+        int endX = isMenuBarOpen ? FRAME_WIDTH : FRAME_WIDTH - MENU_BAR_WIDTH;
 
-        // Check if the menu is open
-        if (menuBar.getBounds().x == FRAME_WIDTH) {
-            // Slide the menu into view
-            menuBar.setBounds(FRAME_WIDTH - MENU_BAR_WIDTH, 0, MENU_BAR_WIDTH, contentAreaHeight);
-        } else {
-            // Slide the menu out of view
-            menuBar.setBounds(FRAME_WIDTH, 0, MENU_BAR_WIDTH, contentAreaHeight);
-        }
-        menuBar.repaint();
+        new Thread(() -> {
+            try {
+                if (!isMenuBarOpen) { // Slide in
+                    for (int x = startX; x >= endX; x -= 10) {
+                        menuBar.setBounds(x, 0, MENU_BAR_WIDTH, FRAME_HEIGHT - STATUS_BAR_HEIGHT - NAV_BAR_HEIGHT);
+                        menuBar.repaint();
+                        Thread.sleep(10);
+                    }
+                } else { // Slide out
+                    for (int x = startX; x <= endX; x += 10) {
+                        menuBar.setBounds(x, 0, MENU_BAR_WIDTH, FRAME_HEIGHT - STATUS_BAR_HEIGHT - NAV_BAR_HEIGHT);
+                        menuBar.repaint();
+                        Thread.sleep(10);
+                    }
+                }
+                isMenuBarOpen = !isMenuBarOpen; // Toggle the state
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
-    // Method to get current time in "h:mm a" format
+    private void navigateBack() {
+        if (!navigationStack.isEmpty()) {
+            BasePage previousPage = navigationStack.pop();
+            previousPage.setVisible(true);
+            dispose();
+        } else {
+            new WelcomePage();
+            dispose();
+        }
+    }
+
+    private void navigateToHome() {
+        new WelcomePage();
+        dispose();
+    }
+
     private String getCurrentTime() {
         SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
         return sdf.format(new Date());
     }
 
-    // Utility method to resize icons
+    protected void addToNavigationStack() {
+        if (navigationStack.isEmpty() || navigationStack.peek() != this) {
+            navigationStack.push(this);
+        }
+    }
+
     private JLabel resizeIcon(String path, int width, int height) {
         try {
             ImageIcon originalIcon = new ImageIcon(path);
@@ -184,22 +251,18 @@ public abstract class BasePage extends JFrame {
         }
     }
 
-    // Utility method to resize icons while maintaining aspect ratio
     private JLabel resizeIconMaintainAspect(String path, int targetHeight) {
         try {
             ImageIcon originalIcon = new ImageIcon(path);
             int originalWidth = originalIcon.getIconWidth();
             int originalHeight = originalIcon.getIconHeight();
 
-            // Calculate the new width based on the target height
             int targetWidth = (int) ((double) originalWidth / originalHeight * targetHeight);
-
-            // Resize the image while maintaining aspect ratio
             Image resizedImage = originalIcon.getImage().getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
             return new JLabel(new ImageIcon(resizedImage));
         } catch (Exception e) {
             System.out.println("Icon not found at: " + path);
-            return new JLabel("X"); // Fallback if the icon doesn't load
+            return new JLabel("X");
         }
     }
 }
