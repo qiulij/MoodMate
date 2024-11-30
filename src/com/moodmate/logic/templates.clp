@@ -64,3 +64,20 @@
 
 (deftemplate printed-recommendation
     (slot user_id))
+
+(deftemplate sleepiness
+    (slot user_id)
+    (slot sleepy)) ; TRUE or FALSE
+
+(deftemplate sleep-quality
+    (slot user_id)
+    (slot satisfaction (type INTEGER))  ; 0 (Very Good) to 3 (Very Bad)
+    (slot sleep-time)                   ; e.g., "23:00"
+    (slot wake-time))                   ; e.g., "07:00"
+
+(deftemplate sleep-recommendation
+    (slot user_id)
+    (slot message))
+    
+(deftemplate printed-sleep-recommendation
+    (slot user_id))

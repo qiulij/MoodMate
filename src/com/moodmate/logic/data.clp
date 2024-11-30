@@ -18,8 +18,8 @@
 (assert (user-emotion (user_id 1) (emotion-name "scared") (intensity 10)))
 (assert (user-emotion (user_id 1) (emotion-name "confused") (intensity 80)))
 
-(assert (trigger-status (user_id 1) (has-trigger TRUE)))
-(assert (rses-level (user_id 1) (level "high")))
+(assert (trigger-status (user_id 1) (has-trigger FALSE)))
+(assert (rses-level (user_id 1) (level "moderate")))
 
 (assert (self-image-answer (user_id 1) (question_id 1) (answer 3)))
 (assert (self-image-answer (user_id 1) (question_id 2) (answer 4)))
@@ -31,3 +31,10 @@
 (assert (self-image-answer (user_id 1) (question_id 8) (answer 1)))
 (assert (self-image-answer (user_id 1) (question_id 9) (answer 3)))
 (assert (self-image-answer (user_id 1) (question_id 10) (answer 4)))
+
+(assert (sleepiness (user_id 1) (sleepy TRUE)))
+(assert (sleep-quality 
+    (user_id 1)
+    (satisfaction 2)        ; Fairly bad
+    (sleep-time "23:00")
+    (wake-time "07:00")))
