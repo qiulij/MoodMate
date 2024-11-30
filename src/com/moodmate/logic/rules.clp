@@ -17,7 +17,7 @@
     (assert (validation-result (valid FALSE) (message "Invalid input: Username and password must not be the same or empty!"))))
 
 (defrule print-validation-result
- (declare (salience 100))
+ (declare (salience 99))
     ?result <- (validation-result (valid ?valid) (message ?message))
 =>
     (printout t ?message crlf)
@@ -25,7 +25,7 @@
 
 
 (defrule validate-profile-basic
-    (declare (salience 90))
+    (declare (salience 98))
     ?input <- (profile-input (name ?name) (age ?age) (gender ?gender))
     (not (profile-validated))  ; Add this line to prevent multiple firings
     (test (neq ?name ""))
@@ -39,7 +39,7 @@
     (printout t "Basic profile validated successfully for user: " ?name crlf))
 
 (defrule check-mbti
-    (declare (salience 90))
+    (declare (salience 97))
     ?input <- (profile-input (user_id ?id) (name ?name) (mbti ?mbti))
     (not (mbti-checked))  ; Control fact
     (test (member$ ?mbti (create$ "INTJ" "ENTJ" "INFJ" "ENFJ" 
@@ -54,7 +54,7 @@
         then (printout t "MBTI provided for user: " ?name " is valid: " ?mbti crlf)))
 
 (defrule calculate-mbti
-    (declare (salience 80)) ;; Ensure MBTI is calculated before printing
+    (declare (salience 96)) ;; Ensure MBTI is calculated before printing
     ?profile <- (profile-input (user_id ?id) (mbti "unknown"))
     (mbti-answer (user_id ?id) (dimension "EI") (question_id 1) (score ?q1))
     (mbti-answer (user_id ?id) (dimension "EI") (question_id 2) (score ?q2))
@@ -75,7 +75,7 @@
 
 
 (defrule validate-notification-frequency
-	(declare (salience 80))
+	(declare (salience 95))
     (profile-input (user_id ?id) (notification-frequency ?freq))
     (not (notification-validated))  ; Control fact
     (test (member$ ?freq (create$ 1 2 3)))
@@ -84,7 +84,7 @@
     (printout t "User " ?id " will receive notifications every " ?freq " hours." crlf))
 
 (defrule print-profile
-    (declare (salience 50)) ;; Ensure this executes last
+    (declare (salience 94)) ;; Ensure this executes last
     ?profile <- (profile-input (user_id ?id)
                                (name ?name)
                                (gender ?gender)
@@ -101,7 +101,7 @@
 
 ; Validation rule for emotion intensity
 (defrule validate-emotion-intensity
-    (declare (salience 50))
+    (declare (salience 93))
     (user-emotion (intensity ?i))
     (test (or (< ?i 0) (> ?i 100)))
 =>
@@ -111,7 +111,7 @@
         
 ; Calculate total intensity with user_id
 (defrule calculate-total-intensity
-    (declare (salience 45))
+    (declare (salience 92))
     (profile-input (user_id ?id))
     (not (total-intensity (user_id ?id)))  ; Only calculate once per user
 
@@ -140,7 +140,7 @@
     
 ; Calculate EFT percentages with user_id
 (defrule normalize-emotions
-    (declare (salience 40))
+    (declare (salience 91))
     (total-intensity (user_id ?id) (value ?total))
     (user-emotion (user_id ?id) (emotion-name ?ename) (intensity ?i))
     (not (normalized-emotion (user_id ?id) (emotion-name ?ename)))  ; Don't normalize twice
@@ -155,6 +155,7 @@
 
 ; Rules for different combinations
 (defrule trigger-yes-rses-high
+	(declare (salience 90))
    	(profile-input (user_id ?id))
     (trigger-status (user_id ?id) (has-trigger TRUE))
     (rses-level (user_id ?id) (level "high"))
@@ -171,6 +172,7 @@
 
 
 (defrule trigger-yes-rses-low
+	(declare (salience 90))
 	(profile-input (user_id ?id))
     (trigger-status (user_id ?id) (has-trigger TRUE))
     (rses-level (user_id ?id) (level "low"))
@@ -186,6 +188,7 @@
         (message "Be kind to yourself. Triggers can be tough, but recognizing them is a step toward growth. Practice self-compassion and celebrate small wins."))))
 
 (defrule trigger-no-rses-high
+	(declare (salience 90))	
 	(profile-input (user_id ?id))
     (trigger-status (user_id ?id) (has-trigger FALSE))
     (rses-level (user_id ?id) (level "high"))
@@ -201,6 +204,7 @@
         (message "Your self-image is strong, which is a fantastic foundation. Use this peaceful time to set goals that align with your strengths."))))
 
 (defrule trigger-no-rses-low
+	(declare (salience 90))
 	(profile-input (user_id ?id))
     (trigger-status (user_id ?id) (has-trigger FALSE))
     (rses-level (user_id ?id) (level "low"))
@@ -217,7 +221,7 @@
 
 ; Check for moderate RSES and no trigger for second factors
 (defrule check-second-factors
-	(declare (salience 35))
+	(declare (salience 89))
 	(profile-input (user_id ?id))
     (trigger-status (user_id ?id) (has-trigger FALSE))
     (rses-level (user_id ?id) (level "moderate"))
@@ -229,7 +233,7 @@
 
 ; Calculate RSES score and categorize it
 (defrule calculate-rses-score
-    (declare (salience 35))
+    (declare (salience 88))
     (profile-input (user_id ?id))
     (not (rses-score (user_id ?id)))  ; Haven't calculated for this user
     (self-image-answer (user_id ?id) (question_id 1) (answer ?a1))
@@ -270,7 +274,7 @@
 
 ; Print recommendation with user_id
 (defrule print-recommendation
-    (declare (salience 30))
+    (declare (salience 87))
     (profile-input (user_id ?id))
     (recommendation (user_id ?id) (message ?m))
     (not (printed-recommendation (user_id ?id)))
@@ -281,7 +285,7 @@
 
 ; Rules for sleep assessment
 (defrule check-sleep-factors
-    (declare (salience 29))
+    (declare (salience 86))
     (need-second-factors (user_id ?id) (need TRUE))
     (sleepiness (user_id ?id) (sleepy TRUE))
 =>
@@ -289,7 +293,7 @@
 
 ; Rule to analyze sleep quality when user is sleepy
 (defrule analyze-sleep-quality
-    (declare (salience 28))
+    (declare (salience 85))
     (need-second-factors (user_id ?id) (need TRUE))
     (sleepiness (user_id ?id) (sleepy TRUE))
     (sleep-quality (user_id ?id) 
@@ -301,11 +305,11 @@
     (bind ?quality-message
         (if (= ?sat 0) 
             then "Your sleep quality is very good, but you're feeling sleepy now. "
-            else (if (= ?sat 1)
+            else (if (= ?sat 2)
                     then "Your sleep quality is fairly good, though you're experiencing sleepiness. "
-                    else (if (= ?sat 2)
+                    else (if (= ?sat 1)
                             then "Your sleep quality needs improvement. "
-                            else (if (= ?sat 3)
+                            else (if (= ?sat 0)
                                     then "Your sleep quality is poor. "
                                     else "Unable to determine sleep quality. ")))))
             
@@ -313,13 +317,13 @@
         (str-cat "Your current sleep schedule is from " ?st " to " ?wt ". "))
         
     (bind ?recommendation
-        (if (= ?sat 0) 
+        (if (= ?sat 3) 
             then "Consider taking a short power nap."
-            else (if (= ?sat 1)
+            else (if (= ?sat 2)
                     then "Try to maintain consistent sleep-wake times."
-                    else (if (= ?sat 2)
+                    else (if (= ?sat 1)
                             then "Focus on sleep hygiene and consistent bedtime routine."
-                            else (if (= ?sat 3)
+                            else (if (= ?sat 0)
                                     then "Consider consulting a healthcare provider about your sleep quality."
                                     else "Try to identify what affects your sleep quality.")))))
             
@@ -331,7 +335,7 @@
 
 ; Rule when user is not sleepy
 (defrule analyze-non-sleepy
-    (declare (salience 27))
+    (declare (salience 84))
     (need-second-factors (user_id ?id) (need TRUE))
     (sleepiness (user_id ?id) (sleepy FALSE))
 =>
@@ -343,7 +347,7 @@
 
 ; Rule to print sleep recommendation
 (defrule print-sleep-recommendation
-    (declare (salience 32))  ; Lower than analysis rules
+    (declare (salience 83))  ; Lower than analysis rules
     ?rec <- (sleep-recommendation (user_id ?id) (message ?m))
     (not (printed-sleep-recommendation (user_id ?id)))  ; Prevent multiple prints
 =>
@@ -351,3 +355,113 @@
     (printout t crlf "Sleep Recommendation:" crlf)
     (printout t ?m crlf))
 
+; Rule to check if physical activity assessment is needed
+(defrule check-physical-activity
+    (declare (salience 82))
+    (need-second-factors (user_id ?id) (need TRUE))
+    (activity (user_id ?id) (has-activity TRUE))
+=>
+    (printout t crlf "Checking physical activity factors..." crlf))
+
+; Rule for no physical activity
+(defrule evaluate-no-activity
+    (declare (salience 81))
+    (need-second-factors (user_id ?id) (need TRUE))
+    (activity (user_id ?id) (has-activity FALSE))
+=>
+    (assert (physical-activity-recommendation 
+        (user_id ?id)
+        (message "Consider incorporating some light physical activity into your day. Even a short walk can help improve your mood.")))
+    (printout t "Physical Activity Analysis Complete" crlf))
+
+
+; Rule to calculate physical activity score
+(defrule calculate-activity-score
+    (declare (salience 80))
+    (need-second-factors (user_id ?id) (need TRUE))
+    ?activity <- (physical-activity (user_id ?id) 
+                                  (has-activity TRUE)
+                                  (duration ?dur)
+                                  (intensity ?int))
+    (not (activity-score-calculated (user_id ?id)))
+=>
+    ; Calculate base score
+    (bind ?score 0)
+    
+    (if (< ?dur 10)
+        then 
+        (bind ?score 0)
+        else 
+        (if (< ?dur 15)
+            then 
+            (bind ?score 
+                (if (eq ?int "high") 
+                    then 3
+                    else (if (eq ?int "moderate")
+                            then 2
+                            else 1)))
+            else 
+            (if (< ?dur 30)
+                then 
+                (bind ?score 
+                    (if (eq ?int "high")
+                        then 4
+                        else (if (eq ?int "moderate")
+                                then 3
+                                else 2)))
+                else 
+                (if (< ?dur 60)
+                    then 
+                    (bind ?score 
+                        (if (eq ?int "high")
+                            then 4
+                            else (if (eq ?int "moderate")
+                                    then 4
+                                    else 3)))
+                    else 
+                    (bind ?score 4)))))  ; Maximum score for duration >= 60 mins regardless of intensity
+    
+    ; Normalize score to 0-100
+    (bind ?normalized-score (* (/ ?score 4) 100))
+    
+    ; Modify fact with calculated score
+    (modify ?activity (score ?normalized-score))
+    
+    ; Assert control fact to prevent multiple calculations
+    (assert (activity-score-calculated (user_id ?id)))
+    
+    ; Generate recommendation based on normalized score
+    (if (= ?normalized-score 0)
+        then 
+        (assert (physical-activity-recommendation 
+            (user_id ?id)
+            (message "Your physical activity duration is too short. Try to exercise for at least 10 minutes continuously.")))
+        else 
+        (if (< ?normalized-score 50)
+            then 
+            (assert (physical-activity-recommendation 
+                (user_id ?id)
+                (message "You've made a start with physical activity. Try to gradually increase your duration and intensity.")))
+            else 
+            (if (< ?normalized-score 75)
+                then 
+                (assert (physical-activity-recommendation 
+                    (user_id ?id)
+                    (message "Good effort with physical activity! Consider increasing either duration or intensity.")))
+                else 
+                (assert (physical-activity-recommendation 
+                    (user_id ?id)
+                    (message "Excellent physical activity level! Keep maintaining this level. Your duration and intensity are ideal for health benefits."))))))
+    
+    (printout t "Physical Activity Score: " ?normalized-score "%" crlf))
+
+
+; Rule to print physical activity recommendation
+(defrule print-activity-recommendation
+    (declare (salience 79))
+    ?rec <- (physical-activity-recommendation (user_id ?id) (message ?m))
+    (not (printed-activity-recommendation (user_id ?id)))
+=>
+    (assert (printed-activity-recommendation (user_id ?id)))
+    (printout t crlf "Physical Activity Recommendation:" crlf)
+    (printout t ?m crlf))

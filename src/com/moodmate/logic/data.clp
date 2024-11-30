@@ -33,8 +33,20 @@
 (assert (self-image-answer (user_id 1) (question_id 10) (answer 4)))
 
 (assert (sleepiness (user_id 1) (sleepy TRUE)))
+; Based on satisfaction level (0-3):
+; 3 = Very good quality -> recommend power nap
+; 2 = Fairly good -> recommend consistent schedule
+; 1 = Needs improvement -> recommend sleep hygiene
+; 0 = Poor quality -> recommend medical consultation
 (assert (sleep-quality 
     (user_id 1)
-    (satisfaction 2)        ; Fairly bad
+    (satisfaction 2)    
     (sleep-time "23:00")
-    (wake-time "07:00")))
+    (wake-time "08:00")))
+
+(assert (activity (user_id 1) (has-activity TRUE)))
+(assert (physical-activity  ; Example 1: Short duration
+    (user_id 1)
+    (has-activity TRUE)
+    (duration 100)            
+    (intensity "light")))

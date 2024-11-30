@@ -81,3 +81,34 @@
     
 (deftemplate printed-sleep-recommendation
     (slot user_id))
+ 
+(deftemplate activity
+    (slot user_id)
+    (slot has-activity)) ; TRUE or FALSE
+   
+; Template for physical activity
+(deftemplate physical-activity
+    (slot user_id)
+    (slot has-activity (type SYMBOL))    ; TRUE or FALSE
+    (slot duration (type INTEGER))       ; in minutes
+    (slot intensity)                     ; "high", "moderate", "light"
+    (slot score (type INTEGER) (default 0)))
+
+; Add a template for tracking score calculation
+(deftemplate activity-score-calculated
+    (slot user_id))
+
+; Template for physical activity recommendation
+(deftemplate physical-activity-recommendation
+    (slot user_id)
+    (slot message))
+
+; Template for tracking printed recommendations
+(deftemplate printed-activity-recommendation
+    (slot user_id))
+    
+; Templates
+(deftemplate appetite-score
+    (slot user_id)
+    (slot score)   ; 0-10, like BDI-II appetite question
+    (slot change)) ; "increase", "decrease", or "no-change"
