@@ -132,8 +132,12 @@
 
 (deftemplate meal-info
     (slot user_id)
-    (slot meals-per-day))    ; 0-6 meals
-
+    (slot meals-per-day)
+    (slot meal-score))    
+    
+(deftemplate meal-pattern-evaluated
+    (slot user_id))
+    
 (deftemplate food-score
     (slot user_id)
     (slot total-score)        ; normalized 0-100

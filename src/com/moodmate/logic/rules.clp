@@ -652,3 +652,65 @@
 
 (printout t crlf "Overall Nutrition Score: " ?total-score "%" crlf))
 
+; Rule to evaluate meal patterns
+(defrule evaluate-meal-patterns
+    (declare (salience 76))  ; After macronutrient evaluation
+    (need-second-factors (user_id ?id) (need TRUE))
+    ?meal <- (meal-info (user_id ?id) (meals-per-day ?m))
+    (not (meal-pattern-evaluated (user_id ?id)))
+=>
+    ; Calculate base meal score based on the number of meals per day
+(bind ?meal-score
+    (if (= ?m 1)
+        then 30   ; 1 meal
+        else 
+        (if (= ?m 2)
+            then 60   ; 2 meals
+            else 
+            (if (and (>= ?m 3) (<= ?m 5))
+                then 90   ; 3-5 meals
+                else 
+                (if (and (>= ?m 6) (<= ?m 7))
+                    then 60   ; 6-7 meals
+                    else 30)))))  ; More than 7 meals
+
+
+
+    ; Assert meal pattern evaluation to prevent duplicate processing
+    (assert (meal-pattern-evaluated (user_id ?id)))
+    (modify ?meal (meal-score ?meal-score))
+    
+    ; Print meal pattern analysis
+    (printout t crlf "Meal Pattern Analysis:" crlf)
+    (printout t "Current meal frequency: " ?m " meals per day" crlf)
+    (if (< ?m 2)
+        then (printout t "Warning: Eating less than 2 meals per day can:"
+                      crlf "- Affect your metabolism and energy levels"
+                      crlf "- Make it harder to get all necessary nutrients"
+                      crlf "- Lead to overeating when you do eat"
+                      crlf "Recommendation: Try to gradually increase to 3 meals per day"
+                      crlf "Start by adding a small breakfast or lunch" crlf))
+    (if (= ?m 2)
+        then (printout t "Having only 2 meals per day:"
+                      crlf "- May not provide consistent energy throughout the day"
+                      crlf "- Could lead to larger portions at each meal"
+                      crlf "Recommendation: Consider adding a third balanced meal"
+                      crlf "If time is an issue, even a nutritious snack can help" crlf))
+    (if (and (>= ?m 3) (<= ?m 5))
+        then (printout t "Excellent meal pattern:"
+                      crlf "- Regular eating schedule helps maintain stable energy levels"
+                      crlf "- Allows for better nutrient distribution throughout the day"
+                      crlf "- Supports healthy metabolism"
+                      crlf "Keep maintaining this consistent pattern" crlf))
+    (if (and (>= ?m 6) (<= ?m 7))
+        then (printout t "Frequent eating pattern:"
+                      crlf "- While small frequent meals work for some, watch portion sizes"
+                      crlf "- Consider if any meals are actually snacks"
+                      crlf "- Monitor overall daily calorie intake"
+                      crlf "Recommendation: Try to consolidate into 3-4 proper meals if possible" crlf))
+    (if (> ?m 7)
+        then (printout t "Frequent eating pattern:"
+                      crlf "- Eating more than 7 times per day might indicate unhealthy grazing"
+                      crlf "- Watch portion sizes and caloric intake"
+                      crlf "Recommendation: Gradually consolidate into fewer meals to avoid overeating" crlf))
+    (printout t "Meal Pattern Score: " ?meal-score "%" crlf))

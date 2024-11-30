@@ -60,3 +60,5 @@
     (minerals 40)    ; Borderline
     (vitamins 45)    ; Good amount
     (water 20)))     ; Too low
+
+(assert (meal-info (user_id 1) (meals-per-day 2)))  ; Low frequency    
