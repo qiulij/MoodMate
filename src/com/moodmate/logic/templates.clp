@@ -107,8 +107,45 @@
 (deftemplate printed-activity-recommendation
     (slot user_id))
     
-; Templates
-(deftemplate appetite-score
+; Template for tracking appetite score calculation
+(deftemplate appetite-score-calculated
+    (slot user_id))
+    
+; Templates for food scoring
+(deftemplate appetite-status
     (slot user_id)
-    (slot score)   ; 0-10, like BDI-II appetite question
-    (slot change)) ; "increase", "decrease", or "no-change"
+    (slot option)        ; "3", "2a", "2b", "1a", "1b", "0a", "0b"
+    (slot score))        ; calculated score 0-3
+
+(deftemplate macronutrient-score-calculated
+    (slot user_id))
+
+(deftemplate macronutrient-intake
+    (slot user_id)
+    (slot carbs)         ; percentage 0-100
+    (slot protein)       ; percentage 0-100
+    (slot fat)           ; percentage 0-100
+    (slot minerals)      ; percentage 0-100
+    (slot vitamins)      ; percentage 0-100
+    (slot water)         ; percentage 0-100
+    (slot score (type INTEGER) (default 0)))    ; percentage 0-100
+
+(deftemplate meal-info
+    (slot user_id)
+    (slot meals-per-day))    ; 0-6 meals
+
+(deftemplate food-score
+    (slot user_id)
+    (slot total-score)        ; normalized 0-100
+    (slot appetite-score)     ; component scores
+    (slot nutrient-score)
+    (slot meal-score))
+
+(deftemplate food-warning
+    (slot user_id)
+    (slot warning-type)   ; "macronutrient" or "meal"
+    (slot message))
+
+(deftemplate appetite-recommendation
+    (slot user_id)
+    (slot message))

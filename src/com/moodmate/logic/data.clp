@@ -50,3 +50,13 @@
     (has-activity TRUE)
     (duration 100)            
     (intensity "light")))
+
+(assert (appetite-status (user_id 1) (option "2a")))
+(assert (macronutrient-intake 
+    (user_id 1)
+    (carbs 30)       ; Lower than needed
+    (protein 45)     ; Good amount
+    (fat 50)         ; Good amount
+    (minerals 40)    ; Borderline
+    (vitamins 45)    ; Good amount
+    (water 20)))     ; Too low
