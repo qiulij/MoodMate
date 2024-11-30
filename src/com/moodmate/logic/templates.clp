@@ -13,7 +13,6 @@
     (slot age)                  ;; Integer, age in years
     (slot mbti (default nil))   ;; String, one of 16 MBTI types or "unknown"
     (slot hobbies)              ;;list of hobbies
-    (slot self-image-score (default nil)) ;; Integer, calculated score (nil initially)
     (slot notification-frequency (default 1))) ;; Integer, hours between notifications
 
 (deftemplate mbti-answer
@@ -26,3 +25,42 @@
     (slot user_id)       ;; Integer, references profile-input user_id
     (slot question_id)   ;; Integer, question identifier
     (slot answer))       ;; Integer, answer for the question (1 to 4)
+
+(deftemplate user-emotion
+    (slot user_id)
+    (slot emotion-name)
+    (slot intensity (type INTEGER) (default 0)))
+
+(deftemplate normalized-emotion
+    (slot user_id)
+    (slot emotion-name)
+    (slot percentage))  ; normalized percentage
+    
+(deftemplate total-intensity
+    (slot user_id)
+    (slot value))
+    
+(deftemplate trigger-status
+    (slot user_id)
+    (slot has-trigger))  ; TRUE or FALSE
+
+(deftemplate rses-level
+    (slot user_id)    
+    (slot level))     ; "high", "low", "moderate"
+
+(deftemplate recommendation
+    (slot user_id)
+    (slot message))
+
+; Template for RSES (Rosenberg Self-Esteem Scale)
+(deftemplate rses-score
+    (slot user_id)
+    (slot score)
+    (slot level))  ; "low", "moderate", "high"
+
+(deftemplate need-second-factors
+    (slot user_id)
+    (slot need)) ; TRUE or FALSE
+
+(deftemplate printed-recommendation
+    (slot user_id))

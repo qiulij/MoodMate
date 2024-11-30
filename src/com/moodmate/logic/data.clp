@@ -1,7 +1,7 @@
 (assert (user-input (username "john") (password "pass123")))
 (assert (profile-input (user_id 1) (name "Alice") (gender 1)
                        (age 25) (mbti "unknown") (hobbies (create$ "reading" "hiking"))
-                       (notification-frequency 2))) ;; Notifications every 2 hours
+                       (notification-frequency 2))) 
 
 (assert (mbti-answer (user_id 1) (dimension "EI") (question_id 1) (score 3)))
 (assert (mbti-answer (user_id 1) (dimension "EI") (question_id 2) (score -2)))
@@ -11,6 +11,16 @@
 (assert (mbti-answer (user_id 1) (dimension "TF") (question_id 2) (score -4)))
 (assert (mbti-answer (user_id 1) (dimension "JP") (question_id 1) (score 5)))
 (assert (mbti-answer (user_id 1) (dimension "JP") (question_id 2) (score -1)))
+
+(assert (user-emotion (user_id 1) (emotion-name "happy") (intensity 60)))
+(assert (user-emotion (user_id 1) (emotion-name "sad") (intensity 40)))
+(assert (user-emotion (user_id 1) (emotion-name "angry") (intensity 80)))
+(assert (user-emotion (user_id 1) (emotion-name "scared") (intensity 10)))
+(assert (user-emotion (user_id 1) (emotion-name "confused") (intensity 80)))
+
+(assert (trigger-status (user_id 1) (has-trigger TRUE)))
+(assert (rses-level (user_id 1) (level "high")))
+
 (assert (self-image-answer (user_id 1) (question_id 1) (answer 3)))
 (assert (self-image-answer (user_id 1) (question_id 2) (answer 4)))
 (assert (self-image-answer (user_id 1) (question_id 3) (answer 2)))
