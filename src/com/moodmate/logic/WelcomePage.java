@@ -1,5 +1,7 @@
 package com.moodmate.logic;
 
+import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
 
 import javax.swing.*;
@@ -19,22 +21,50 @@ public class WelcomePage extends BasePage {
         welcomeLabel.setBounds(30, 50, contentArea.getWidth() - 60, 40);
         backgroundLabel.add(welcomeLabel);
 
+        JLabel welcomeText = new JLabel("Do you have an account?", SwingConstants.CENTER);
+        welcomeText.setFont(new Font("Helvetica Neue", Font.PLAIN,14));
+        welcomeText.setBounds(30, 150, contentArea.getWidth() - 60, 40);
+        backgroundLabel.add(welcomeText);
+
+        
+        
         JButton signInButton = new JButton("Sign In");
         signInButton.setBounds((contentArea.getWidth() - 120) / 2, 200, 120, 40);
+        signInButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        signInButton.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 0, true));
+        signInButton.setBackground(customGreen);
+        signInButton.setOpaque(true);
+
         signInButton.addActionListener(e -> {
             addToNavigationStack();
             new SignInPage();
             dispose();
-        });
+        }); 
         backgroundLabel.add(signInButton);
+        
+        
+        JLabel signupText = new JLabel("If you don't have an account,", SwingConstants.CENTER);
+        signupText.setFont(new Font("Helvetica Neue", Font.PLAIN, 14));
+        signupText.setBounds(30, 270, contentArea.getWidth() - 60, 40);
+        signupText.setForeground(Color.GRAY);  // Set text color to grey
+        backgroundLabel.add(signupText);
 
-        JButton signUpButton = new JButton("Sign Up");
-        signUpButton.setBounds((contentArea.getWidth() - 120) / 2, 260, 120, 40);
+        // Sign Up Button
+        JButton signUpButton = new JButton("Sign Up Here");
+        signUpButton.setBounds((contentArea.getWidth() - 120) / 2, 300, 120, 40);
+        signUpButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); 
         signUpButton.addActionListener(e -> {
             addToNavigationStack();
             new SignUpPage();
             dispose();
         });
+        backgroundLabel.add(signUpButton);
+//        signUpButton.setBounds(PADDING_X, 380, contentArea.getWidth() - 2 * PADDING_X, FIELD_HEIGHT + 30);
+        signUpButton.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 0, true));
+//        signUpButton.setBackground(Color.decode("#45C78A"));
+//        signUpButton.setBackground(getForeground());
+        signUpButton.setOpaque(true);
+
         backgroundLabel.add(signUpButton);
     }
 

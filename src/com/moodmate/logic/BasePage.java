@@ -30,6 +30,11 @@ public abstract class BasePage extends JFrame {
     protected JPanel topPanel;
     private JPanel menuBar;
     private JLayeredPane layeredPane;
+    
+    public Color customGreen = new Color(69, 199, 138);
+    public Color customYellow = new Color(255, 221, 128);
+    public Color customRed= new Color(255, 82, 82);
+    
 
     public BasePage() {
         // Set up the main frame
@@ -187,6 +192,20 @@ public abstract class BasePage extends JFrame {
         setVisible(true);
     }
 
+    public void setContent(JPanel newContent) {
+        // Clear the current content
+        contentArea.removeAll();
+
+        // Set the new content
+        contentArea.add(newContent, BorderLayout.CENTER);
+
+        // Revalidate and repaint the content area to apply changes
+        contentArea.revalidate();
+        contentArea.repaint();
+    }
+
+    
+    
     private void toggleMenuBar() {
         int startX = isMenuBarOpen ? FRAME_WIDTH - MENU_BAR_WIDTH : FRAME_WIDTH;
         int endX = isMenuBarOpen ? FRAME_WIDTH : FRAME_WIDTH - MENU_BAR_WIDTH;

@@ -5,13 +5,13 @@ import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
-public class SignInPage extends BasePage {
+public class NotificationSettingPage extends BasePage {
 
     // Constants for easy adjustments
     private static final int PADDING_X = 60; // Horizontal padding for fields
     private static final int FIELD_HEIGHT = 30; // Height for the input fields and button
 
-    public SignInPage() {
+    public NotificationSettingPage() {
         super();
 
         // Add background image
@@ -21,48 +21,42 @@ public class SignInPage extends BasePage {
         backgroundLabel.setLayout(null);
 
         // Title Label
-        JLabel titleLabel = new JLabel("Sign In", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Sign Up", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Helvetica Neue", Font.BOLD, 24));
         titleLabel.setBounds(PADDING_X, 50, contentArea.getWidth() - 2 * PADDING_X, 40);
         backgroundLabel.add(titleLabel);
 
-        JLabel welcomeText = new JLabel("Welcome back :)", SwingConstants.CENTER);
-        welcomeText.setFont(new Font("Helvetica Neue", Font.PLAIN,14));
-        welcomeText.setBounds(30, 150, contentArea.getWidth() - 60, 40);
-        backgroundLabel.add(welcomeText);
-
-        JLabel welcomeText2 = new JLabel("please enter your user name and password", SwingConstants.CENTER);
-        welcomeText2.setFont(new Font("Helvetica Neue", Font.PLAIN,14));
-        welcomeText2.setBounds(30, 180, contentArea.getWidth() - 60, 40);
-        backgroundLabel.add(welcomeText2);
-
-        
-        
         // Username Field
-        JTextField usernameField = createInputField("Username", 250);
+        JTextField usernameField = createInputField("Username", 120);
         backgroundLabel.add(usernameField);
 
-       
+        // Email Field
+        JTextField emailField = createInputField("Email", 180);
+        backgroundLabel.add(emailField);
+
         // Password Field
-        JPasswordField passwordField = createPasswordField("Password", 300);
+        JPasswordField passwordField = createPasswordField("Password", 240);
         backgroundLabel.add(passwordField);
 
-        
-        // Sign In Button (same width and height as input fields)
-        JButton signInButton = new JButton("Sign In");
-        signInButton.setBounds(PADDING_X, 380, contentArea.getWidth() - 2 * PADDING_X, FIELD_HEIGHT + 30);
-        signInButton.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 0, true));
-//        signInButton.setBackground(Color.decode("#45C78A"));
-        signInButton.setBackground(customGreen);
-        signInButton.setOpaque(true);
-        signInButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); 
-        signInButton.addActionListener(e -> {
+        // Confirm Password Field
+        JPasswordField confirmPasswordField = createPasswordField("Confirm Password", 300);
+        backgroundLabel.add(confirmPasswordField);
+
+        // Sign Up Button (same width and height as input fields)
+        JButton signUpButton = new JButton("Sign Up");
+        signUpButton.setBounds(PADDING_X, 380, contentArea.getWidth() - 2 * PADDING_X, FIELD_HEIGHT + 30);
+        signUpButton.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 0, true));
+//        signUpButton.setBackground(Color.decode("#45C78A"));
+        signUpButton.setBackground(customGreen);
+        signUpButton.setOpaque(true);
+        signUpButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); 
+        signUpButton.addActionListener(e -> {
             JOptionPane.showMessageDialog(this, "Sign-up successful!");
             addToNavigationStack();
-            new WelcomePage();
+            new UserProfilePage();
             dispose();
         });
-        backgroundLabel.add(signInButton);
+        backgroundLabel.add(signUpButton);
     }
 
     // Method to create input fields with placeholders
@@ -121,6 +115,6 @@ public class SignInPage extends BasePage {
     }
 
     public static void main(String[] args) {
-        new SignInPage();
+        new NotificationSettingPage();
     }
 }
