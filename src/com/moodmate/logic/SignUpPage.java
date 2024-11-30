@@ -22,7 +22,7 @@ public class SignUpPage extends BasePage {
 
         // Title Label
         JLabel titleLabel = new JLabel("Sign Up", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Helvetica Neue", Font.BOLD, 24));
+        titleLabel.setFont(new Font(customFont, Font.BOLD, 24));
         titleLabel.setBounds(PADDING_X, 50, contentArea.getWidth() - 2 * PADDING_X, 40);
         backgroundLabel.add(titleLabel);
 
@@ -51,11 +51,39 @@ public class SignUpPage extends BasePage {
         signUpButton.setOpaque(true);
         signUpButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); 
         signUpButton.addActionListener(e -> {
-            
-            addToNavigationStack();
-            new UserProfilePage();
-            dispose();
+            String username = usernameField.getText().trim();
+            String email = emailField.getText().trim();
+            String password = new String(passwordField.getPassword()).trim();
+            String confirmPassword = new String(confirmPasswordField.getPassword()).trim();
+
+            // Validate inputs
+            if (username.isEmpty() || username.equals("Username") ||
+                email.isEmpty() || email.equals("Email") ||
+                password.isEmpty() || password.equals("Password") ||
+                confirmPassword.isEmpty() || confirmPassword.equals("Confirm Password")) {
+
+                JOptionPane.showMessageDialog(
+                    this,
+                    "All fields are required. Please fill in all the details.",
+                    "Input Required",
+                    JOptionPane.WARNING_MESSAGE
+                );
+            } else if (!password.equals(confirmPassword)) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Passwords do not match. Please confirm your password correctly.",
+                    "Password Mismatch",
+                    JOptionPane.WARNING_MESSAGE
+                );
+            } else {
+                // Proceed to UserProfilePage if inputs are valid
+                JOptionPane.showMessageDialog(this, "Sign-up successful!");
+                addToNavigationStack();
+                new UserProfilePage();
+                dispose();
+            }
         });
+
         backgroundLabel.add(signUpButton);
     }
 
@@ -63,7 +91,7 @@ public class SignUpPage extends BasePage {
     private JTextField createInputField(String placeholder, int yPosition) {
         JTextField field = new JTextField(placeholder);
         field.setBounds(PADDING_X, yPosition, contentArea.getWidth() - 2 * PADDING_X, FIELD_HEIGHT);
-        field.setFont(new Font("Helvetica Neue", Font.PLAIN, 14));
+        field.setFont(new Font(customFont, Font.PLAIN, 14));
         field.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 0, true)); 
         // Placeholder behavior
         field.setForeground(Color.GRAY);
@@ -89,7 +117,7 @@ public class SignUpPage extends BasePage {
     private JPasswordField createPasswordField(String placeholder, int yPosition) {
         JPasswordField field = new JPasswordField(placeholder);
         field.setBounds(PADDING_X, yPosition, contentArea.getWidth() - 2 * PADDING_X, FIELD_HEIGHT);
-        field.setFont(new Font("Helvetica Neue", Font.PLAIN, 14));
+        field.setFont(new Font(customFont, Font.PLAIN, 14));
         field.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 0, true)); 
         // Placeholder behavior
         field.setEchoChar((char) 0); // Show the placeholder text

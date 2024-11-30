@@ -22,17 +22,17 @@ public class SignInPage extends BasePage {
 
         // Title Label
         JLabel titleLabel = new JLabel("Sign In", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Helvetica Neue", Font.BOLD, 24));
+        titleLabel.setFont(new Font(customFont, Font.BOLD, 24));
         titleLabel.setBounds(PADDING_X, 50, contentArea.getWidth() - 2 * PADDING_X, 40);
         backgroundLabel.add(titleLabel);
 
         JLabel welcomeText = new JLabel("Welcome back :)", SwingConstants.CENTER);
-        welcomeText.setFont(new Font("Helvetica Neue", Font.PLAIN,14));
+        welcomeText.setFont(new Font(customFont, Font.PLAIN,14));
         welcomeText.setBounds(30, 150, contentArea.getWidth() - 60, 40);
         backgroundLabel.add(welcomeText);
 
         JLabel welcomeText2 = new JLabel("please enter your user name and password", SwingConstants.CENTER);
-        welcomeText2.setFont(new Font("Helvetica Neue", Font.PLAIN,14));
+        welcomeText2.setFont(new Font(customFont, Font.PLAIN,14));
         welcomeText2.setBounds(30, 180, contentArea.getWidth() - 60, 40);
         backgroundLabel.add(welcomeText2);
 
@@ -57,10 +57,25 @@ public class SignInPage extends BasePage {
         signInButton.setOpaque(true);
         signInButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); 
         signInButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Sign-up successful!");
-            addToNavigationStack();
-            new WelcomePage();
-            dispose();
+            String username = usernameField.getText().trim();
+            String password = new String(passwordField.getPassword()).trim();
+
+            // Check if the user has entered valid input
+            if (username.equals("Username") || username.isEmpty() ||
+                password.equals("Password") || password.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Please enter both username and password.",
+                    "Input Required",
+                    JOptionPane.WARNING_MESSAGE
+                );
+            } else {
+                // Proceed if inputs are valid
+                JOptionPane.showMessageDialog(this, "Sign-in successful!");
+                addToNavigationStack();
+                new WelcomePage();
+                dispose();
+            }
         });
         backgroundLabel.add(signInButton);
     }
@@ -69,7 +84,7 @@ public class SignInPage extends BasePage {
     private JTextField createInputField(String placeholder, int yPosition) {
         JTextField field = new JTextField(placeholder);
         field.setBounds(PADDING_X, yPosition, contentArea.getWidth() - 2 * PADDING_X, FIELD_HEIGHT);
-        field.setFont(new Font("Helvetica Neue", Font.PLAIN, 14));
+        field.setFont(new Font(customFont, Font.PLAIN, 14));
         field.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 0, true)); 
         // Placeholder behavior
         field.setForeground(Color.GRAY);
@@ -95,7 +110,7 @@ public class SignInPage extends BasePage {
     private JPasswordField createPasswordField(String placeholder, int yPosition) {
         JPasswordField field = new JPasswordField(placeholder);
         field.setBounds(PADDING_X, yPosition, contentArea.getWidth() - 2 * PADDING_X, FIELD_HEIGHT);
-        field.setFont(new Font("Helvetica Neue", Font.PLAIN, 14));
+        field.setFont(new Font(customFont, Font.PLAIN, 14));
         field.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 0, true)); 
         // Placeholder behavior
         field.setEchoChar((char) 0); // Show the placeholder text

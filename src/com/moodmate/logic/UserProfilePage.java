@@ -27,7 +27,7 @@ public class UserProfilePage extends BasePage {
 
         // Title Label
         JLabel titleLabel = new JLabel("MBTI ", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Helvetica Neue", Font.BOLD, 20));
+        titleLabel.setFont(new Font(customFont, Font.BOLD, 20));
         titleLabel.setBounds(PADDING_X, currentY, contentArea.getWidth() - 2 * PADDING_X, FIELD_HEIGHT);
         contentPanel.add(titleLabel);
 
@@ -35,14 +35,14 @@ public class UserProfilePage extends BasePage {
 
         // Description Labels
         JLabel description = new JLabel("Take a few moments to make your", SwingConstants.CENTER);
-        description.setFont(new Font("Helvetica Neue", Font.PLAIN, 12));
+        description.setFont(new Font(customFont, Font.PLAIN, 12));
         description.setBounds(PADDING_X, currentY, contentArea.getWidth() - 2 * PADDING_X, FIELD_HEIGHT);
         contentPanel.add(description);
 
         currentY += FIELD_HEIGHT;
 
         JLabel description2 = new JLabel("profile for a customized experience", SwingConstants.CENTER);
-        description2.setFont(new Font("Helvetica Neue", Font.PLAIN, 12));
+        description2.setFont(new Font(customFont, Font.PLAIN, 12));
         description2.setBounds(PADDING_X, currentY, contentArea.getWidth() - 2 * PADDING_X, FIELD_HEIGHT);
         contentPanel.add(description2);
 
@@ -100,7 +100,7 @@ public class UserProfilePage extends BasePage {
 
         // MBTI Preferences using sliders
         JLabel mbtiLabel = new JLabel("MBTI Preferences:");
-        mbtiLabel.setFont(new Font("Helvetica Neue", Font.BOLD, 16));
+        mbtiLabel.setFont(new Font(customFont, Font.BOLD, 16));
         mbtiLabel.setBounds(PADDING_X, currentY, 300, FIELD_HEIGHT);
         contentPanel.add(mbtiLabel);
         
@@ -109,7 +109,7 @@ public class UserProfilePage extends BasePage {
         
         //MBTI TEST button
         JLabel mbtiTestLabel = new JLabel("Take a short test here:");
-        mbtiTestLabel.setFont(new Font("Helvetica Neue", Font.PLAIN, 12));
+        mbtiTestLabel.setFont(new Font(customFont, Font.PLAIN, 12));
         mbtiTestLabel.setBounds(PADDING_X, currentY, 300, FIELD_HEIGHT);
         contentPanel.add(mbtiTestLabel);
         int test= contentArea.getWidth();
@@ -120,13 +120,27 @@ public class UserProfilePage extends BasePage {
 //        mbtiTestButton.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 0, true));
         mbtiTestButton.setBackground(customGreen);
         mbtiTestButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));    
-     
-        mbtiTestButton.addActionListener(e -> {
-            addToNavigationStack();
-            new MbtiTestPage();
-            dispose();
-        });
         
+        mbtiTestButton.addActionListener(e -> {
+            String username = usernameField.getText().trim();
+            String age = ageField.getText().trim();
+            boolean genderSelected = maleButton.isSelected() || femaleButton.isSelected() || preferNotToSayButton.isSelected();
+
+            // Validate fields
+            if (username.isEmpty() || age.isEmpty() || !genderSelected) {
+                JOptionPane.showMessageDialog(
+                    contentPanel,
+                    "Please fill out all required fields (Name, Age, and Gender) before taking the MBTI test.",
+                    "Incomplete Profile",
+                    JOptionPane.WARNING_MESSAGE
+                );
+            } else {
+                addToNavigationStack();
+                new MbtiTestPage();
+                dispose();
+            }
+        });
+
         
 
         contentPanel.add(mbtiTestButton);
@@ -154,11 +168,23 @@ public class UserProfilePage extends BasePage {
         nextButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));    
         
         nextButton.addActionListener(e -> {
-        	
-        	 addToNavigationStack();
-        	 new NotificationSettingPage();
-             dispose();
-            ;
+            String username = usernameField.getText().trim();
+            String age = ageField.getText().trim();
+            boolean genderSelected = maleButton.isSelected() || femaleButton.isSelected() || preferNotToSayButton.isSelected();
+
+            // Validate fields
+            if (username.isEmpty() || age.isEmpty() || !genderSelected) {
+                JOptionPane.showMessageDialog(
+                    contentPanel,
+                    "Please fill out all required fields (Name, Age, and Gender) before proceeding.",
+                    "Incomplete Profile",
+                    JOptionPane.WARNING_MESSAGE
+                );
+            } else {
+                addToNavigationStack();
+                new HobbiesPage();
+                dispose();
+            }
         });
  
         contentPanel.add(nextButton);

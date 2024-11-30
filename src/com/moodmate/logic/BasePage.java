@@ -1,6 +1,8 @@
 package com.moodmate.logic;
 
 import javax.swing.*;
+import javax.swing.colorchooser.ColorSelectionModel;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -10,7 +12,7 @@ import java.util.Stack;
 
 public abstract class BasePage extends JFrame {
     // Constants for layout sizes
-    private static final int FRAME_WIDTH = 360;
+    private static final int FRAME_WIDTH = 400;
     private static final int FRAME_HEIGHT = 780;
     private static final int STATUS_ICON_SIZE = 15;
     private static final int STATUS_BAR_HEIGHT = 30;
@@ -31,10 +33,12 @@ public abstract class BasePage extends JFrame {
     private JPanel menuBar;
     private JLayeredPane layeredPane;
     
+    
     public Color customGreen = new Color(69, 199, 138);
     public Color customYellow = new Color(255, 221, 128);
     public Color customRed= new Color(255, 82, 82);
-    
+    public Color customBackgroundColor= new Color(224, 218, 202);
+    public String customFont = "Helvetica Neue";
 
     public BasePage() {
         // Set up the main frame
@@ -48,11 +52,12 @@ public abstract class BasePage extends JFrame {
         JPanel containerPanel = new JPanel();
         containerPanel.setLayout(new BorderLayout());
         containerPanel.setPreferredSize(new Dimension(FRAME_WIDTH, STATUS_BAR_HEIGHT + TOP_PANEL_HEIGHT));
+        
 
         // -------- Status Bar --------
         statusBar = new JPanel();
         statusBar.setPreferredSize(new Dimension(FRAME_WIDTH, STATUS_BAR_HEIGHT));
-        statusBar.setBackground(Color.LIGHT_GRAY);
+//        statusBar.setBackground(Color.LIGHT_GRAY);
         statusBar.setLayout(new BorderLayout());
         statusBar.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // Padding
 
@@ -64,7 +69,6 @@ public abstract class BasePage extends JFrame {
 
         JPanel iconPanel = new JPanel();
         iconPanel.setLayout(new BoxLayout(iconPanel, BoxLayout.X_AXIS));
-        iconPanel.setBackground(Color.LIGHT_GRAY);
 
         iconPanel.add(resizeIcon("assets/images/wifi.png", STATUS_ICON_SIZE, STATUS_ICON_SIZE));
         iconPanel.add(Box.createHorizontalStrut(5));
@@ -121,14 +125,14 @@ public abstract class BasePage extends JFrame {
 
         // -------- Content Area --------
         contentArea = new JPanel();
-        contentArea.setBackground(Color.WHITE);
+        contentArea.setBackground(customBackgroundColor);
         contentArea.setBounds(0, 0, FRAME_WIDTH, FRAME_HEIGHT - STATUS_BAR_HEIGHT - NAV_BAR_HEIGHT);
         contentArea.setLayout(new BorderLayout());
         layeredPane.add(contentArea, JLayeredPane.DEFAULT_LAYER);
 
         // -------- Sliding Menu Bar --------
         menuBar = new JPanel();
-        menuBar.setBackground(Color.LIGHT_GRAY);
+        menuBar.setBackground(customBackgroundColor);
         menuBar.setBounds(FRAME_WIDTH, 0, MENU_BAR_WIDTH, FRAME_HEIGHT - STATUS_BAR_HEIGHT - NAV_BAR_HEIGHT);
         menuBar.setLayout(new BoxLayout(menuBar, BoxLayout.Y_AXIS));
 
@@ -144,7 +148,7 @@ public abstract class BasePage extends JFrame {
 
         // -------- Navigation Bar --------
         navigationBar = new JPanel();
-        navigationBar.setBackground(Color.LIGHT_GRAY);
+//        navigationBar.setBackground(Color.LIGHT_GRAY);
         navigationBar.setPreferredSize(new Dimension(FRAME_WIDTH, NAV_BAR_HEIGHT));
         navigationBar.setLayout(new GridBagLayout());
 

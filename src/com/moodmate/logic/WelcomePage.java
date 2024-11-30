@@ -17,12 +17,12 @@ public class WelcomePage extends BasePage {
         contentArea.add(backgroundLabel);
 
         JLabel welcomeLabel = new JLabel("Welcome to MoodMate", SwingConstants.CENTER);
-        welcomeLabel.setFont(new Font("Helvetica Neue", Font.BOLD, 24));
+        welcomeLabel.setFont(new Font(customFont, Font.BOLD, 24));
         welcomeLabel.setBounds(30, 50, contentArea.getWidth() - 60, 40);
         backgroundLabel.add(welcomeLabel);
 
         JLabel welcomeText = new JLabel("Do you have an account?", SwingConstants.CENTER);
-        welcomeText.setFont(new Font("Helvetica Neue", Font.PLAIN,14));
+        welcomeText.setFont(new Font(customFont, Font.PLAIN,14));
         welcomeText.setBounds(30, 150, contentArea.getWidth() - 60, 40);
         backgroundLabel.add(welcomeText);
 
@@ -44,7 +44,7 @@ public class WelcomePage extends BasePage {
         
         
         JLabel signupText = new JLabel("If you don't have an account,", SwingConstants.CENTER);
-        signupText.setFont(new Font("Helvetica Neue", Font.PLAIN, 14));
+        signupText.setFont(new Font(customFont, Font.PLAIN, 14));
         signupText.setBounds(30, 270, contentArea.getWidth() - 60, 40);
         signupText.setForeground(Color.GRAY);  // Set text color to grey
         backgroundLabel.add(signupText);
