@@ -714,3 +714,29 @@
                       crlf "- Watch portion sizes and caloric intake"
                       crlf "Recommendation: Gradually consolidate into fewer meals to avoid overeating" crlf))
     (printout t "Meal Pattern Score: " ?meal-score "%" crlf))
+
+(defrule calculate-food-score
+    (declare (salience 75))
+    ?meal <- (meal-info (user_id ?id) (meal-score ?meal-score))
+    ?appetite <- (appetite-status (user_id ?id) (score ?appetite-score))
+    ?nutrient <- (macronutrient-intake (user_id ?id) (score ?nutrient-score))
+    (not (food-score (user_id ?id)))  ; Ensure score is calculated only once
+=>
+    ; Calculate the total raw score
+    (bind ?raw-score (+ (* 0.4 ?nutrient-score)  ; Macronutrient contributes 40%
+                        (* 0.3 ?meal-score)      ; Meal pattern contributes 30%
+                        (* 0.3 (* ?appetite-score 33.33)))) ; Appetite contributes 30%
+
+    ; Normalize raw score to 0-100
+    (bind ?normalized-score (min 100 (max 0 (round ?raw-score))))
+
+    ; Assert the final food score
+    (assert (food-score (user_id ?id)
+                        (total-score ?normalized-score)
+                        (appetite-score ?appetite-score)
+                        (nutrient-score ?nutrient-score)
+                        (meal-score ?meal-score)))
+
+    ; Print the analysis
+    (printout t "Food Score Analysis for user " ?id ":" crlf)
+    (printout t "Final Food Score (Normalized): " ?normalized-score "%" crlf))
