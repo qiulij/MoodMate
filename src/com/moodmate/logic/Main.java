@@ -9,7 +9,8 @@ public class Main {
 		String file1 = "src/com/moodmate/logic/templates.clp";
 		String file2 = "src/com/moodmate/logic/data.clp";
 		String file3 ="src/com/moodmate/logic/primary_reason_rules.clp";
-		String file4 ="src/com/moodmate/logic/food_rules.clp";
+//		String file4 ="src/com/moodmate/logic/secondary_reason_rules.clp";
+		String file4 ="src/com/moodmate/logic/sleep_rules.clp";
 
 
 		
@@ -40,3 +41,13 @@ public class Main {
 
 
 }
+
+// for sleep time conversion
+//class TimeHelper {
+//    public static double getDecimalHours(String time) {
+//        String[] parts = time.split(":");
+//        int hours = Integer.parseInt(parts[0]);
+//        int minutes = Integer.parseInt(parts[1]);
+//        return hours + (minutes / 60.0);  // returns like 23.5 for 23:30
+//    }
+//}

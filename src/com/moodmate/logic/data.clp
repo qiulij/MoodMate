@@ -41,8 +41,10 @@
 (assert (sleep-quality 
     (user_id 1)
     (satisfaction 2)    
-    (sleep-time "23:00")
-    (wake-time "08:00")))
+    (sleep-time "00:30")
+    (wake-time "09:00")
+    (sleep-decimal 0.5)
+    (wake-decimal 9)))
 
 (assert (activity (user_id 1) (has-activity TRUE)))
 (assert (physical-activity  ; Example 1: Short duration

@@ -71,9 +71,15 @@
 
 (deftemplate sleep-quality
     (slot user_id)
-    (slot satisfaction (type INTEGER))  ; 0 (Very Good) to 3 (Very Bad)
-    (slot sleep-time)                   ; e.g., "23:00"
-    (slot wake-time))                   ; e.g., "07:00"
+    (slot satisfaction)    ; 0-3 (0=very poor, 3=very good)
+    (slot sleep-time)      ; e.g., "23:30" (for display)
+    (slot wake-time)       ; e.g., "07:00" (for display)
+    (slot sleep-decimal)   ; e.g., 23.5 (for calculation)
+    (slot wake-decimal)    ; e.g., 7.0 (for calculation)
+    (slot score))          ; final calculated score 0-100
+
+(deftemplate sleep-score-calculated
+	(slot user_id))
 
 (deftemplate sleep-recommendation
     (slot user_id)
