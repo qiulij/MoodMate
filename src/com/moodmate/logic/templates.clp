@@ -28,18 +28,47 @@
 
 (deftemplate user-emotion
     (slot user_id)
+    (slot day)           ; Add day
+    (slot hour)          ; Add hour
     (slot emotion-name)
     (slot intensity (type INTEGER) (default 0)))
 
 (deftemplate normalized-emotion
     (slot user_id)
+    (slot day)           ; Add day
+    (slot hour)          ; Add hour
     (slot emotion-name)
-    (slot percentage))  ; normalized percentage
-    
+    (slot percentage))
+
+; Template to track running totals and counts
+(deftemplate emotion-total
+    (slot user_id)
+    (slot day)
+    (slot emotion-name)
+    (slot sum (default 0))
+    (slot count (default 0)))
+
+; Template to track processed readings
+(deftemplate processed-reading
+    (slot user_id)
+    (slot day)
+    (slot hour)
+    (slot emotion-name))
+
+; Add template for daily summary
+(deftemplate daily-emotion-summary
+    (slot user_id)
+    (slot day)
+    (slot emotion-name)
+    (slot avg-percentage)
+    (slot reading-count))
+
 (deftemplate total-intensity
     (slot user_id)
+    (slot day)           ; Add day
+    (slot hour)          ; Add hour
     (slot value))
-    
+
 (deftemplate trigger-status
     (slot user_id)
     (slot has-trigger))  ; TRUE or FALSE
@@ -159,3 +188,4 @@
 (deftemplate appetite-recommendation
     (slot user_id)
     (slot message))
+

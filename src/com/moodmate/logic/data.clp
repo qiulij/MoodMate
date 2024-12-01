@@ -12,11 +12,32 @@
 (assert (mbti-answer (user_id 1) (dimension "JP") (question_id 1) (score 5)))
 (assert (mbti-answer (user_id 1) (dimension "JP") (question_id 2) (score -1)))
 
-(assert (user-emotion (user_id 1) (emotion-name "happy") (intensity 60)))
-(assert (user-emotion (user_id 1) (emotion-name "sad") (intensity 40)))
-(assert (user-emotion (user_id 1) (emotion-name "angry") (intensity 80)))
-(assert (user-emotion (user_id 1) (emotion-name "scared") (intensity 10)))
-(assert (user-emotion (user_id 1) (emotion-name "confused") (intensity 80)))
+(assert (user-emotion (user_id 1) (day 1) (hour 8) (emotion-name "happy") (intensity 60)))
+(assert (user-emotion (user_id 1)(day 1) (hour 8) (emotion-name "sad") (intensity 40)))
+(assert (user-emotion (user_id 1) (day 1) (hour 8) (emotion-name "angry") (intensity 80)))
+(assert (user-emotion (user_id 1) (day 1) (hour 8) (emotion-name "scared") (intensity 10)))
+(assert (user-emotion (user_id 1) (day 1) (hour 8) (emotion-name "confused") (intensity 80)))
+
+(assert (user-emotion (user_id 1) (day 1) (hour 10) (emotion-name "happy") (intensity 30)))
+(assert (user-emotion (user_id 1) (day 1) (hour 10) (emotion-name "sad") (intensity 80)))
+(assert (user-emotion (user_id 1) (day 1) (hour 10) (emotion-name "angry") (intensity 80)))
+(assert (user-emotion (user_id 1) (day 1) (hour 10) (emotion-name "scared") (intensity 10)))
+(assert (user-emotion (user_id 1) (day 1) (hour 10) (emotion-name "confused") (intensity 40)))
+
+
+(assert (normalized-emotion (user_id 1) (day 1) (hour 8) (emotion-name "happy") (percentage 22)))
+(assert (normalized-emotion (user_id 1) (day 1) (hour 8) (emotion-name "sad") (percentage 15)))
+(assert (normalized-emotion (user_id 1) (day 1) (hour 8) (emotion-name "angry") (percentage 33)))
+(assert (normalized-emotion (user_id 1) (day 1) (hour 8) (emotion-name "scared") (percentage 4)))
+(assert (normalized-emotion (user_id 1) (day 1) (hour 8) (emotion-name "confused") (percentage 30)))
+(assert (normalized-emotion (user_id 1) (day 1) (hour 10) (emotion-name "happy") (percentage 13)))
+(assert (normalized-emotion (user_id 1) (day 1) (hour 10) (emotion-name "sad") (percentage 33)))
+(assert (normalized-emotion (user_id 1) (day 1) (hour 10) (emotion-name "angry") (percentage 33)))
+(assert (normalized-emotion (user_id 1) (day 1) (hour 10) (emotion-name "scared") (percentage 4)))
+(assert (normalized-emotion (user_id 1) (day 1) (hour 10) (emotion-name "confused") (percentage 17)))
+
+
+
 
 (assert (trigger-status (user_id 1) (has-trigger FALSE)))
 (assert (rses-level (user_id 1) (level "moderate")))
@@ -64,3 +85,4 @@
     (water 20)))     ; Too low
 
 (assert (meal-info (user_id 1) (meals-per-day 2)))  ; Low frequency    
+
