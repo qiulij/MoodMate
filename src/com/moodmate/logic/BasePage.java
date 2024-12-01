@@ -12,17 +12,14 @@ import java.util.Stack;
 
 public abstract class BasePage extends JFrame {
     // Constants for layout sizes
-    private static final int FRAME_WIDTH = 400;
-    private static final int FRAME_HEIGHT = 780;
-    private static final int STATUS_ICON_SIZE = 15;
-    private static final int STATUS_BAR_HEIGHT = 30;
-    private static final int NAV_BAR_HEIGHT = 30;
-    private static final int TOP_PANEL_HEIGHT = 40;
-    private static final int ICON_SIZE = 20;
-    private static final int MENU_BAR_WIDTH = 200;
-
-    private boolean isMenuBarOpen = false; // Track the state of the menu bar
-
+	protected static final int FRAME_WIDTH = 400;
+	protected static final int FRAME_HEIGHT = 780;
+    protected static final int STATUS_ICON_SIZE = 15;
+    protected static final int STATUS_BAR_HEIGHT = 30;
+    protected static final int NAV_BAR_HEIGHT = 30;
+    protected static final int TOP_PANEL_HEIGHT = 40;
+    protected static final int ICON_SIZE = 20;
+    protected static final int MENU_BAR_WIDTH = 200;
     // Navigation stack to keep track of visited pages
     private static final Stack<BasePage> navigationStack = new Stack<>();
 
@@ -30,10 +27,10 @@ public abstract class BasePage extends JFrame {
     protected JPanel navigationBar;
     protected JPanel contentArea;
     protected JPanel topPanel;
-    private JPanel menuBar;
-    private JLayeredPane layeredPane;
-    
-    
+    protected JPanel menuBar;
+    protected JLayeredPane layeredPane;
+    protected JPanel containerPanel;
+
     public Color customGreen = new Color(69, 199, 138);
     public Color customYellow = new Color(255, 221, 128);
     public Color customRed= new Color(255, 82, 82);
@@ -49,7 +46,7 @@ public abstract class BasePage extends JFrame {
         setResizable(false);
 
         // -------- Container Panel for Status Bar and Top Panel --------
-        JPanel containerPanel = new JPanel();
+        containerPanel= new JPanel();
         containerPanel.setLayout(new BorderLayout());
         containerPanel.setPreferredSize(new Dimension(FRAME_WIDTH, STATUS_BAR_HEIGHT + TOP_PANEL_HEIGHT));
         
@@ -97,21 +94,7 @@ public abstract class BasePage extends JFrame {
             System.out.println("Logo image not found: assets/images/logo.png");
         }
 
-        // Add Profile Icon (Right) with Menu Action
-        JLabel profileIcon = resizeIcon("assets/images/profile.png", ICON_SIZE, ICON_SIZE);
-        if (profileIcon != null) {
-            profileIcon.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            profileIcon.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    toggleMenuBar(); // Trigger sidebar toggle on click
-                }
-            });
-            topPanel.add(profileIcon, BorderLayout.EAST);
-        } else {
-            System.out.println("Profile icon image not found: assets/images/profile.png");
-        }
-
+        
         // Add the topPanel to the containerPanel
         containerPanel.add(topPanel, BorderLayout.SOUTH);
 
@@ -209,33 +192,7 @@ public abstract class BasePage extends JFrame {
     }
 
     
-    
-    private void toggleMenuBar() {
-        int startX = isMenuBarOpen ? FRAME_WIDTH - MENU_BAR_WIDTH : FRAME_WIDTH;
-        int endX = isMenuBarOpen ? FRAME_WIDTH : FRAME_WIDTH - MENU_BAR_WIDTH;
-
-        new Thread(() -> {
-            try {
-                if (!isMenuBarOpen) { // Slide in
-                    for (int x = startX; x >= endX; x -= 10) {
-                        menuBar.setBounds(x, 0, MENU_BAR_WIDTH, FRAME_HEIGHT - STATUS_BAR_HEIGHT - NAV_BAR_HEIGHT);
-                        menuBar.repaint();
-                        Thread.sleep(10);
-                    }
-                } else { // Slide out
-                    for (int x = startX; x <= endX; x += 10) {
-                        menuBar.setBounds(x, 0, MENU_BAR_WIDTH, FRAME_HEIGHT - STATUS_BAR_HEIGHT - NAV_BAR_HEIGHT);
-                        menuBar.repaint();
-                        Thread.sleep(10);
-                    }
-                }
-                isMenuBarOpen = !isMenuBarOpen; // Toggle the state
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
-
+ 
     private void navigateBack() {
         if (!navigationStack.isEmpty()) {
             BasePage previousPage = navigationStack.pop();
@@ -263,7 +220,7 @@ public abstract class BasePage extends JFrame {
         }
     }
 
-    private JLabel resizeIcon(String path, int width, int height) {
+    protected JLabel resizeIcon(String path, int width, int height) {
         try {
             ImageIcon originalIcon = new ImageIcon(path);
             Image resizedImage = originalIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
@@ -274,7 +231,7 @@ public abstract class BasePage extends JFrame {
         }
     }
 
-    private JLabel resizeIconMaintainAspect(String path, int targetHeight) {
+    protected JLabel resizeIconMaintainAspect(String path, int targetHeight) {
         try {
             ImageIcon originalIcon = new ImageIcon(path);
             int originalWidth = originalIcon.getIconWidth();
