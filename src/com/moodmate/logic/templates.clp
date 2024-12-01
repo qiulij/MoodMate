@@ -225,6 +225,57 @@
 (deftemplate bipolar-assessment
     (slot user_id)
     (slot risk-level)        ; "low", "moderate", "high", "severe"
+    (slot confidence)        ; 0-100% 
+    ; how certain we are about the risk assessment based on the available evidence
+    (slot evidence)          ; Description of evidence
+    (slot recommendation))   ; Clinical recommendations
+
+; Template for depression assessment
+(deftemplate depression-assessment
+    (slot user_id)
+    (slot risk-level)        ; "low", "moderate", "high", "severe"
     (slot confidence)        ; 0-100%
     (slot evidence)          ; Description of evidence
     (slot recommendation))   ; Clinical recommendations
+
+; Template for anxiety assessment
+(deftemplate anxiety-assessment
+    (slot user_id)
+    (slot risk-level)        ; "low", "moderate", "high", "severe"
+    (slot evidence)          ; Description of evidence
+    (slot recommendation))   ; Clinical recommendations
+
+; Template for daily weather
+(deftemplate daily-weather
+    (slot user_id)
+    (slot day)
+    (slot condition)     ; "sunny", "cloudy", "rainy", "snowy"
+    (slot temperature))  ; temperature in Celsius
+
+; Template for SAD assessment
+(deftemplate sad-assessment
+    (slot user_id)
+    (slot risk-level)        ; "low", "moderate", "high", "severe"
+    (slot evidence)          ; Description of evidence
+    (slot recommendation))   ; Clinical recommendations
+
+; Templates for assessment control
+(deftemplate appetite-pattern-assessed
+    (slot user_id))
+
+(deftemplate restrictive-pattern-assessed
+    (slot user_id))
+
+(deftemplate binge-pattern-assessed
+    (slot user_id))
+
+(deftemplate irregular-pattern-assessed
+    (slot user_id))
+
+; Template for eating disorder assessment
+(deftemplate eating-disorder-assessment
+    (slot user_id)
+    (slot risk-level)        ; "low", "moderate", "high", "severe"
+    (slot pattern-type)      ; "anorexic", "bulimic", "binge", "restrictive"
+    (slot evidence)
+    (slot recommendation))

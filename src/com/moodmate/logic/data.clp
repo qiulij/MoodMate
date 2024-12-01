@@ -46,16 +46,16 @@
 (assert (normalized-emotion (user_id 1) (day 2) (hour 10) (emotion-name "angry") (percentage 25)))
 (assert (normalized-emotion (user_id 1) (day 2) (hour 10) (emotion-name "scared") (percentage 10)))
 (assert (normalized-emotion (user_id 1) (day 2) (hour 10) (emotion-name "confused") (percentage 5)))
-(assert (normalized-emotion (user_id 1) (day 3) (hour 8) (emotion-name "happy") (percentage 10)))
-(assert (normalized-emotion (user_id 1) (day 3) (hour 8) (emotion-name "sad") (percentage 60)))
-(assert (normalized-emotion (user_id 1) (day 3) (hour 8) (emotion-name "angry") (percentage 30)))
-(assert (normalized-emotion (user_id 1) (day 3) (hour 8) (emotion-name "scared") (percentage 0)))
-(assert (normalized-emotion (user_id 1) (day 3) (hour 8) (emotion-name "confused") (percentage 0)))
+(assert (normalized-emotion (user_id 1) (day 3) (hour 8) (emotion-name "happy") (percentage 8)))
+(assert (normalized-emotion (user_id 1) (day 3) (hour 8) (emotion-name "sad") (percentage 0)))
+(assert (normalized-emotion (user_id 1) (day 3) (hour 8) (emotion-name "angry") (percentage 0)))
+(assert (normalized-emotion (user_id 1) (day 3) (hour 8) (emotion-name "scared") (percentage 60)))
+(assert (normalized-emotion (user_id 1) (day 3) (hour 8) (emotion-name "confused") (percentage 32)))
 (assert (normalized-emotion (user_id 1) (day 3) (hour 10) (emotion-name "happy") (percentage 0)))
-(assert (normalized-emotion (user_id 1) (day 3) (hour 10) (emotion-name "sad") (percentage 10)))
-(assert (normalized-emotion (user_id 1) (day 3) (hour 10) (emotion-name "angry") (percentage 80)))
+(assert (normalized-emotion (user_id 1) (day 3) (hour 10) (emotion-name "sad") (percentage 70)))
+(assert (normalized-emotion (user_id 1) (day 3) (hour 10) (emotion-name "angry") (percentage 0)))
 (assert (normalized-emotion (user_id 1) (day 3) (hour 10) (emotion-name "scared") (percentage 0)))
-(assert (normalized-emotion (user_id 1) (day 3) (hour 10) (emotion-name "confused") (percentage 10)))
+(assert (normalized-emotion (user_id 1) (day 3) (hour 10) (emotion-name "confused") (percentage 30)))
 
 
 
@@ -94,7 +94,7 @@
     (duration 100)            
     (intensity "light")))
 
-(assert (appetite-status (user_id 1) (option "2a")))
+(assert (appetite-status (user_id 1) (option "0a")))
 (assert (macronutrient-intake 
     (user_id 1)
     (carbs 30)       ; Lower than needed
@@ -106,3 +106,6 @@
 
 (assert (meal-info (user_id 1) (meals-per-day 2)))  ; Low frequency    
 
+(assert (daily-weather (user_id 1) (day 1) (condition "cloudy") (temperature 5)))
+
+(assert (daily-weather (user_id 1) (day 2) (condition "rainy") (temperature 8)))
