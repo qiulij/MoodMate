@@ -189,3 +189,42 @@
     (slot user_id)
     (slot message))
 
+; Update the emotional-pattern template to include a default value for persistence
+(deftemplate emotional-pattern
+    (slot user_id)
+    (slot day)
+    (slot pattern-type)      ; "manic", "depressive", "mixed", etc.
+    (slot intensity)         ; "mild", "moderate", "severe"
+    (slot persistence (type INTEGER) (default 1))  ; Added default value
+    (slot description))      ; detailed description of why this pattern was detected
+
+(deftemplate processed-switch
+    (slot user_id)
+    (slot day1)
+    (slot day2))
+
+(deftemplate counter
+    (slot user_id)
+    (slot type)
+    (slot count))
+
+(deftemplate processed-pattern
+    (slot user_id)
+    (slot pattern-type)
+    (slot day)
+    (slot intensity))
+    
+; Template to track processed persistence checks
+(deftemplate processed-persistence
+    (slot user_id)
+    (slot day1)
+    (slot day2)
+    (slot pattern-type))
+
+; Template for bipolar assessment
+(deftemplate bipolar-assessment
+    (slot user_id)
+    (slot risk-level)        ; "low", "moderate", "high", "severe"
+    (slot confidence)        ; 0-100%
+    (slot evidence)          ; Description of evidence
+    (slot recommendation))   ; Clinical recommendations
