@@ -1,4 +1,4 @@
-package com.moodmate.logic;
+package com.moodmate.GUI;
 
 import com.moodmate.database.DatabaseConnection;
 import jess.*;

@@ -1,4 +1,4 @@
-package com.moodmate.logic;
+package com.moodmate.GUI;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

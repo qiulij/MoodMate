@@ -1,4 +1,4 @@
-package com.moodmate.logic;
+package com.moodmate.GUI;
 import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.*;
