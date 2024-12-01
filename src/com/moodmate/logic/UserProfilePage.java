@@ -1,7 +1,10 @@
 package com.moodmate.logic;
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.text.NumberFormatter;
+
 import java.awt.*;
+import java.text.NumberFormat;
 import java.util.Hashtable;
 
 public class UserProfilePage extends BasePage {
@@ -9,7 +12,30 @@ public class UserProfilePage extends BasePage {
     private static final int PADDING_X = 60; // Horizontal padding for fields
     private static final int FIELD_HEIGHT = 30; // Height for the input fields
     private static final int MARGIN = 20; // Vertical margin between components
+ // Declare the input fields and buttons as instance variables
+    private JTextField usernameField;
+    private JFormattedTextField ageField;
+    private JRadioButton maleButton;
+    private JRadioButton femaleButton;
+    private JRadioButton preferNotToSayButton;
+    
+    
+    public UserProfilePage(String username, String age, String gender) {
 
+    	this();
+        // Pre-fill the fields with the provided data
+        usernameField.setText(username);
+        ageField.setText(age); // This works because ageField is now a JFormattedTextField
+        if (gender.equals("Male")) {
+            maleButton.setSelected(true);
+        } else if (gender.equals("Female")) {
+            femaleButton.setSelected(true);
+        } else if (gender.equals("Prefer not to say")) {
+            preferNotToSayButton.setSelected(true);
+        }
+    }
+
+    
     public UserProfilePage() {
         super();
 
@@ -26,7 +52,7 @@ public class UserProfilePage extends BasePage {
         int currentY = 20; // Start Y position for components
 
         // Title Label
-        JLabel titleLabel = new JLabel("MBTI ", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Tell me about yourself ", SwingConstants.CENTER);
         titleLabel.setFont(new Font(customFont, Font.BOLD, 20));
         titleLabel.setBounds(PADDING_X, currentY, contentArea.getWidth() - 2 * PADDING_X, FIELD_HEIGHT);
         contentPanel.add(titleLabel);
@@ -53,18 +79,30 @@ public class UserProfilePage extends BasePage {
         usernameLabel.setBounds(PADDING_X, currentY, 100, FIELD_HEIGHT);
         contentPanel.add(usernameLabel);
 
-        JTextField usernameField = new JTextField();
+        usernameField = new JTextField();
         usernameField.setBounds(PADDING_X + 110, currentY, contentArea.getWidth() - PADDING_X - 140, FIELD_HEIGHT);
         contentPanel.add(usernameField);
 
         currentY += FIELD_HEIGHT + MARGIN;
 
         // Age
+//        JLabel ageLabel = new JLabel("My age is:");
+//        ageLabel.setBounds(PADDING_X, currentY, 100, FIELD_HEIGHT);
+//        contentPanel.add(ageLabel);
+
         JLabel ageLabel = new JLabel("My age is:");
         ageLabel.setBounds(PADDING_X, currentY, 100, FIELD_HEIGHT);
         contentPanel.add(ageLabel);
 
-        JTextField ageField = new JTextField();
+        // Create a NumberFormatter to restrict input to integers
+        NumberFormat integerFormat = NumberFormat.getIntegerInstance();
+        integerFormat.setGroupingUsed(false); // Disable thousand separators
+        NumberFormatter numberFormatter = new NumberFormatter(integerFormat);
+        numberFormatter.setValueClass(Integer.class); // Only allow integers
+        numberFormatter.setAllowsInvalid(false); // Reject invalid input
+        numberFormatter.setMinimum(1); // Optional: Set a minimum value for age
+
+        ageField = new JFormattedTextField(numberFormatter);
         ageField.setBounds(PADDING_X + 110, currentY, contentArea.getWidth() - PADDING_X - 140, FIELD_HEIGHT);
         contentPanel.add(ageField);
 
@@ -75,19 +113,19 @@ public class UserProfilePage extends BasePage {
         genderLabel.setBounds(PADDING_X, currentY, 100, FIELD_HEIGHT);
         contentPanel.add(genderLabel);
 
-        JRadioButton maleButton = new JRadioButton("Male");
+        maleButton = new JRadioButton("Male");
         maleButton.setBounds(PADDING_X + 110, currentY, 140, FIELD_HEIGHT);
         contentPanel.add(maleButton);
 
         currentY += FIELD_HEIGHT;
 
-        JRadioButton femaleButton = new JRadioButton("Female");
+        femaleButton = new JRadioButton("Female");
         femaleButton.setBounds(PADDING_X + 110, currentY, 140, FIELD_HEIGHT);
         contentPanel.add(femaleButton);
 
         currentY += FIELD_HEIGHT;
 
-        JRadioButton preferNotToSayButton = new JRadioButton("Prefer not to say");
+        preferNotToSayButton = new JRadioButton("Prefer not to say");
         preferNotToSayButton.setBounds(PADDING_X + 110, currentY, 140, FIELD_HEIGHT);
         contentPanel.add(preferNotToSayButton);
 
@@ -123,23 +161,44 @@ public class UserProfilePage extends BasePage {
         
         mbtiTestButton.addActionListener(e -> {
             String username = usernameField.getText().trim();
-            String age = ageField.getText().trim();
-            boolean genderSelected = maleButton.isSelected() || femaleButton.isSelected() || preferNotToSayButton.isSelected();
+            String ageText = ageField.getText().trim();
+            int age = -1;
 
-            // Validate fields
-            if (username.isEmpty() || age.isEmpty() || !genderSelected) {
+            try {
+                age = Integer.parseInt(ageText);
+            } catch (NumberFormatException ex) {
+                // Show error if age is not a valid integer
                 JOptionPane.showMessageDialog(
                     contentPanel,
-                    "Please fill out all required fields (Name, Age, and Gender) before taking the MBTI test.",
+                    "Please enter a valid age.",
+                    "Invalid Age",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return; // Stop further processing
+            }
+
+            String gender = maleButton.isSelected() ? "Male" : 
+                            femaleButton.isSelected() ? "Female" : 
+                            preferNotToSayButton.isSelected() ? "Prefer not to say" : "";
+
+            if (username.isEmpty() || gender.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                    contentPanel,
+                    "Please fill out all required fields (Name, Age, and Gender).",
                     "Incomplete Profile",
                     JOptionPane.WARNING_MESSAGE
                 );
             } else {
                 addToNavigationStack();
-                new MbtiTestPage();
+
+                // Pass data to MbtiTestPage
+                MbtiTestPage mbtiTestPage = new MbtiTestPage(username, age, gender);
+                mbtiTestPage.setVisible(true);
                 dispose();
             }
         });
+
+        
 
         
 
@@ -168,18 +227,36 @@ public class UserProfilePage extends BasePage {
         nextButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));    
         
         nextButton.addActionListener(e -> {
+        	
             String username = usernameField.getText().trim();
-            String age = ageField.getText().trim();
-            boolean genderSelected = maleButton.isSelected() || femaleButton.isSelected() || preferNotToSayButton.isSelected();
+            String ageText = ageField.getText().trim();
+            int age = -1;
 
-            // Validate fields
-            if (username.isEmpty() || age.isEmpty() || !genderSelected) {
+            try {
+                age = Integer.parseInt(ageText);
+            } catch (NumberFormatException ex) {
+                // Show error if age is not a valid integer
                 JOptionPane.showMessageDialog(
                     contentPanel,
-                    "Please fill out all required fields (Name, Age, and Gender) before proceeding.",
+                    "Please enter a valid age.",
+                    "Invalid Age",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return; // Stop further processing
+            }
+
+            String gender = maleButton.isSelected() ? "Male" : 
+                            femaleButton.isSelected() ? "Female" : 
+                            preferNotToSayButton.isSelected() ? "Prefer not to say" : "";
+
+            if (username.isEmpty() || gender.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                    contentPanel,
+                    "Please fill out all required fields (Name, Age, and Gender).",
                     "Incomplete Profile",
                     JOptionPane.WARNING_MESSAGE
                 );
+
             } else {
                 addToNavigationStack();
                 new HobbiesPage();
@@ -219,4 +296,5 @@ public class UserProfilePage extends BasePage {
     public static void main(String[] args) {
         new UserProfilePage();
     }
+
 }

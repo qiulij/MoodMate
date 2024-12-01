@@ -9,11 +9,16 @@ public class MbtiTestPage extends BasePage {
     private static final int PADDING_X = 60; // Horizontal padding for fields
     private static final int FIELD_HEIGHT = 30; // Height for the input fields
     private static final int MARGIN = 20; // Vertical margin between components
+    private static String name="";
+    private static int age=0;
+    private static String gender="";
     
     int contentWidth= contentArea.getWidth();
-    public MbtiTestPage() {
-        super();
-
+    public MbtiTestPage(String username, int age, String gender) {
+        super(); // Call BasePage setup
+        this.name = username;
+        this.age = age;
+        this.gender = gender;
         // Create a contentPanel for all components
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(null); // Absolute positioning
@@ -67,14 +72,52 @@ public class MbtiTestPage extends BasePage {
         nextButton.setOpaque(true);
         nextButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));    
         
+
         nextButton.addActionListener(e -> {
-        	
-        	 addToNavigationStack();
-        	 new HobbiesPage();
-             dispose();
-            ;
+            String mbtiResult = "ENFJ"; // Hardcoded MBTI result for now
+
+            // Fetch user details (already passed to MbtiTestPage)
+            String message = "Here are your details:\n" +
+                             "Name: " + username + "\n" +
+                             "Age: " + age + "\n" +
+                             "Gender: " + gender + "\n" +
+                             "MBTI Type: " + mbtiResult;
+
+            // Create options for the dialog
+            String[] options = {"OK", "Edit"};
+            int choice = JOptionPane.showOptionDialog(
+                this, // Parent component
+                message, // Message to display
+                "Your MBTI Result", // Title of the dialog
+                JOptionPane.YES_NO_OPTION, // Option type
+                JOptionPane.INFORMATION_MESSAGE, // Message type
+                null, // Icon (null for default)
+                options, // Button text
+                options[0] // Default button
+            );
+
+            // Handle the user's choice
+            if (choice == 1) { // "Edit" option selected
+            	System.out.println("Navigating to UserProfilePage with:");
+            	System.out.println("Name: " + username);
+            	System.out.println("Age: " + age);
+            	System.out.println("Gender: " + gender);
+
+                new UserProfilePage(username, String.valueOf(age), gender); // Pass current data back
+               
+                dispose(); // Close the MBTI test page
+            } else if (choice == 0) { // "OK" option selected
+            	addToNavigationStack();
+                new HobbiesPage();
+
+                // Close the test page
+                dispose();
+            }
         });
- 
+
+        
+        
+        
         contentPanel.add(nextButton);
         currentY += MARGIN;
         contentPanel.setPreferredSize(new Dimension(contentWidth, currentY + 100));
@@ -132,6 +175,6 @@ public class MbtiTestPage extends BasePage {
     }
 
     public static void main(String[] args) {
-        new MbtiTestPage();
+        new MbtiTestPage("test",0,"female");
     }
 }

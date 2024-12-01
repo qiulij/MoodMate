@@ -76,11 +76,10 @@ public class SignUpPage extends BasePage {
                     JOptionPane.WARNING_MESSAGE
                 );
             } else {
-                // Proceed to UserProfilePage if inputs are valid
-                JOptionPane.showMessageDialog(this, "Sign-up successful!");
+      
                 addToNavigationStack();
                 new UserProfilePage();
-                dispose();
+                dispose(); 
             }
         });
 

@@ -109,15 +109,22 @@ public class HobbiesPage extends BasePage {
         nextButton.setBackground(customGreen);
         nextButton.setOpaque(true);
         nextButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
+        
         nextButton.addActionListener(e -> {
-            // Print selected hobbies to the console
-            System.out.println("Selected Hobbies: " + selectedHobbies);
-
-            // Proceed to the next page
-            addToNavigationStack();
-            new NotificationSettingPage();
-            dispose();
+            if (selectedHobbies.size() < 2) {
+                // Display a warning message if fewer than 2 hobbies are selected
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Please select at least two hobbies before proceeding.",
+                    "Selection Required",
+                    JOptionPane.WARNING_MESSAGE
+                );
+            } else {
+                // Proceed to the next page
+                addToNavigationStack();
+                new NotificationSettingPage();
+                dispose();
+            }
         });
 
         contentPanel.add(nextButton);
