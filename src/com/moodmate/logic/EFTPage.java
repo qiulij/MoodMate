@@ -87,10 +87,10 @@ public class EFTPage extends BaseHomePage {
         emotionLabel.setFont(new Font(customFont, Font.BOLD, 16));
         emotionLabel.setBounds(20, innerY, emotionBox.getWidth() - PADDING_X, FIELD_HEIGHT);
         emotionBox.add(emotionLabel);
-        innerY += FIELD_HEIGHT + MARGIN;
+        innerY += FIELD_HEIGHT ;
 
         // Emotion Description
-        StringBuilder adjectivesText = new StringBuilder("Adjectives that describe this emotion:\n ");
+        StringBuilder adjectivesText = new StringBuilder("Adjectives that describe this emotion: \n ");
         
         for (String adj : adjectives) {
             adjectivesText.append(adj).append(", ");

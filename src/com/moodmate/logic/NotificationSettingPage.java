@@ -95,8 +95,14 @@ public class NotificationSettingPage extends BasePage {
         nextButton.addActionListener(e -> {
             // Check if any radio button is selected
             if (oneHourButton.isSelected() || twoHourButton.isSelected() || threeHourButton.isSelected()) {
+            	 JOptionPane.showMessageDialog(
+                         contentPanel,
+                         "Everything has been setup",
+                         "LET'S GO  !!!",
+                         JOptionPane.INFORMATION_MESSAGE
+                     );
                 addToNavigationStack();
-                // new HomePage(); // Uncomment if you want to navigate to a different page
+                 new HomePage(); // Uncomment if you want to navigate to a different page
                 dispose();
             } else {
                 // Show a warning dialog if no option is selected
