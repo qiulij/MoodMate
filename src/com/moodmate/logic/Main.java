@@ -1,3 +1,10 @@
+
+package com.moodmate.logic;
+
+public class Main {
+
+}
+=======
 package com.moodmate.logic;
 
 import jess.JessException;
@@ -53,3 +60,4 @@ public class Main {
 //        return hours + (minutes / 60.0);  // returns like 23.5 for 23:30
 //    }
 //}
+

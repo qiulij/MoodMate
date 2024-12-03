@@ -1,4 +1,39 @@
 (deftemplate user-input
+    (slot username)
+    (slot email)
+    (slot password)
+)
+
+(deftemplate validation-result
+    (slot valid)
+    (slot message)
+)
+(deftemplate email-validation-result
+    (slot valid)
+    (slot message)
+)
+(deftemplate password-validation-result
+    (slot valid)
+    (slot message)
+)
+(deftemplate sign-in-input
+    (slot username)
+    (slot password)
+)
+(deftemplate sign-in-result
+    (slot valid)
+    (slot message)
+)
+
+(deftemplate user-record
+    (slot username)
+    (slot password)
+)
+
+
+
+
+(deftemplate user-input
     (slot username)  ;; String, must not be empty
     (slot password)) ;; String, must not be empty
 
@@ -280,6 +315,7 @@
     (slot evidence)
     (slot recommendation))
 
+
 (deftemplate therapy-suggestion
     (slot user_id)
     (slot condition)     ; "anxiety", "depression", "bipolar", "SAD", "eating-disorder"
@@ -287,3 +323,4 @@
     (slot reasoning)     ; Why this suggestion matches their profile
     (slot mbti_factor)   ; How it aligns with their MBTI
     (slot severity))     ; Match with risk level from assessments
+
