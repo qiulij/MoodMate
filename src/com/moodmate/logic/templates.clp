@@ -31,7 +31,6 @@
 )
 
 
-
 (deftemplate profile-input
     (slot user_id)              ;; Integer, unique identifier
     (slot name)                 ;; String, user name
@@ -306,7 +305,6 @@
     (slot evidence)
     (slot recommendation))
 
-
 (deftemplate therapy-suggestion
     (slot user_id)
     (slot condition)     ; "anxiety", "depression", "bipolar", "SAD", "eating-disorder"
@@ -314,4 +312,3 @@
     (slot reasoning)     ; Why this suggestion matches their profile
     (slot mbti_factor)   ; How it aligns with their MBTI
     (slot severity))     ; Match with risk level from assessments
-

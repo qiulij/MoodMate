@@ -1,4 +1,3 @@
-
 ;;;;;;;;;;;;;;;;;;;;;;;;CHECK THE USERNAME ;;;;;;;;;;;;; 
 (defrule check-valid-username-and-password
     (user-input (username ?u) (password ?p))
@@ -65,8 +64,6 @@
 =>
    (assert (email-validation-result (valid FALSE) (message "Invalid email format!")))
 )
-
-
 
 (defrule print-validation-result
  (declare (salience 99))
