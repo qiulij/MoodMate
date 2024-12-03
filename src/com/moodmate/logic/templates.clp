@@ -32,15 +32,6 @@
 
 
 
-
-(deftemplate user-input
-    (slot username)  ;; String, must not be empty
-    (slot password)) ;; String, must not be empty
-
-(deftemplate validation-result
-    (slot valid)     ;; Boolean, TRUE or FALSE
-    (slot message))  ;; String, validation message
-
 (deftemplate profile-input
     (slot user_id)              ;; Integer, unique identifier
     (slot name)                 ;; String, user name

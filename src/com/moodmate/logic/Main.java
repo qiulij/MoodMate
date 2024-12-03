@@ -1,11 +1,7 @@
 
 package com.moodmate.logic;
 
-public class Main {
 
-}
-=======
-package com.moodmate.logic;
 
 import jess.JessException;
 import jess.Rete;
