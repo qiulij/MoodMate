@@ -3,4 +3,5 @@ module MoodMate {
     requires jess;         // For Jess rule engine
     requires java.sql;     // For database connectivity
     requires com.google.gson;
+
 }

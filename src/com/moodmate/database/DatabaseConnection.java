@@ -9,6 +9,7 @@ public class DatabaseConnection {
 
     private static final String DB_URL = "jdbc:mysql://localhost:3306/moodMate";
     private static final String DB_USER = "root"; // Replace with your MySQL username
+
     private static final String DB_PASSWORD = "002915"; // Replace with your MySQL password
 
     // Method to get a database connection
