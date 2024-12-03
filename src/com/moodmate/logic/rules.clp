@@ -66,7 +66,7 @@
    (assert (email-validation-result (valid FALSE) (message "Invalid email format!")))
 )
 
-=======
+
 
 (defrule print-validation-result
  (declare (salience 99))

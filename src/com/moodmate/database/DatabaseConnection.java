@@ -13,9 +13,10 @@ import com.moodmate.logic.User;
 
 public class DatabaseConnection {
 
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/moodmate";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/moodMate";
     private static final String DB_USER = "root"; // Replace with your MySQL username
     private static final String DB_PASSWORD = "002915"; // Replace with your MySQL password
+    
 
     // Method to get a database connection
     public static Connection getConnection() throws SQLException {
@@ -38,26 +39,27 @@ public class DatabaseConnection {
     }
  
 
-    // Method to insert a new user into the Authentication table
-    //public static List<User> insertUser(String username, String password, String email) {
-    	// Check if the username already exists
-      //  if (usernameExists(username)) {
-        //    return false; // Return false if duplicate username
-        //}
-        //String query = "INSERT INTO Authentication (username, password, email) VALUES (?, ?, ?)";
-        //try (Connection connection = getConnection();
-          //   PreparedStatement statement = connection.prepareStatement(query)) {
-            //statement.setString(1, username);
-            //statement.setString(2, password);
-            //statement.setString(3, email);
-            //statement.executeUpdate();
-            //return true; // Return true if insertion is a success
-        //} catch (SQLException e) {
-          //  e.printStackTrace();
-            //return false; // Return false if insertion fails
-        //}
-    
-    
+//    // Method to insert a new user into the Authentication table
+//    public static boolean insertUser(String username, String password) {
+//        // Check if the username already exists
+//        if (usernameExists(username)) {
+//            return false; // Return false if duplicate username
+//        }
+//        
+//        String query = "INSERT INTO Authentication (username, password) VALUES (?, ?)";
+//        try (Connection connection = getConnection();
+//             PreparedStatement statement = connection.prepareStatement(query)) {
+//            statement.setString(1, username);
+//            statement.setString(2, password);
+//            statement.executeUpdate();
+//            return true; // Return true if insertion is successful
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//            return false; // Return false if insertion fails
+//        }
+//    }
+
+
  // Method to retrieve user_id for a given username
     public static Integer getUserIdByUsername(String username) {
         String query = "SELECT user_id FROM Authentication WHERE username = ?";

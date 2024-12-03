@@ -1,4 +1,4 @@
-(assert (user-input (username "john") (password "pass123")))
+(assert (user-input (username "john") (email 122548ewq99@gmail.com) (password "Pass1234567!")))
 (assert (profile-input (user_id 1) (name "Alice") (gender 1)
                        (age 25) (mbti "INFJ") (hobbies "art relax social collection")
                        (notification-frequency 2)))
