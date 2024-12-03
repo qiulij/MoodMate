@@ -279,3 +279,11 @@
     (slot pattern-type)      ; "anorexic", "bulimic", "binge", "restrictive"
     (slot evidence)
     (slot recommendation))
+
+(deftemplate therapy-suggestion
+    (slot user_id)
+    (slot condition)     ; "anxiety", "depression", "bipolar", "SAD", "eating-disorder"
+    (slot activity_type) ; Based on hobbies
+    (slot reasoning)     ; Why this suggestion matches their profile
+    (slot mbti_factor)   ; How it aligns with their MBTI
+    (slot severity))     ; Match with risk level from assessments

@@ -1,7 +1,7 @@
 (assert (user-input (username "john") (password "pass123")))
 (assert (profile-input (user_id 1) (name "Alice") (gender 1)
-                       (age 25) (mbti "unknown") (hobbies (create$ "reading" "hiking"))
-                       (notification-frequency 2))) 
+                       (age 25) (mbti "INFJ") (hobbies "art relax social collection")
+                       (notification-frequency 2)))
 
 (assert (mbti-answer (user_id 1) (dimension "EI") (question_id 1) (score 3)))
 (assert (mbti-answer (user_id 1) (dimension "EI") (question_id 2) (score -2)))
@@ -109,3 +109,10 @@
 (assert (daily-weather (user_id 1) (day 1) (condition "cloudy") (temperature 5)))
 
 (assert (daily-weather (user_id 1) (day 2) (condition "rainy") (temperature 8)))
+
+
+(assert (depression-assessment 
+    (user_id 1)
+    (risk-level "moderate")
+    (evidence "Elevated depression levels with physical symptoms")
+    (recommendation "Consider professional consultation")))
