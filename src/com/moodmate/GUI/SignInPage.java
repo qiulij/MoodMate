@@ -1,9 +1,17 @@
 package com.moodmate.GUI;
 
 import javax.swing.*;
+import java.util.List;
+
+import com.moodmate.database.DatabaseConnection;
+import com.moodmate.logic.User;
+import java.util.List;
+import jess.*;
+
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.util.Iterator;
 
 public class SignInPage extends BasePage {
 
@@ -70,11 +78,69 @@ public class SignInPage extends BasePage {
                     JOptionPane.WARNING_MESSAGE
                 );
             } else {
-                // Proceed if inputs are valid
-                JOptionPane.showMessageDialog(this, "Sign-in successful!");
-                addToNavigationStack();
-                new WelcomePage();
-                dispose();
+                try {
+                    Rete engine = new Rete();
+                    engine.reset();
+                    engine.batch("src/com/moodmate/logic/templates.clp");
+                    engine.batch("src/com/moodmate/logic/rule_signin.clp");
+                    
+                    List<User> users = DatabaseConnection.fetchAllUsers();
+                    for (User user : users) {
+                        Fact userRecord = new Fact("user-record", engine);
+                        userRecord.setSlotValue("username", new Value(user.getUsername(), RU.STRING));
+                        userRecord.setSlotValue("password", new Value(user.getPassword(), RU.STRING));
+                        engine.assertFact(userRecord);
+                    }
+                    
+                    Fact signInInput = new Fact("sign-in-input", engine);
+                    signInInput.setSlotValue("username", new Value(username, RU.STRING));
+                    signInInput.setSlotValue("password", new Value(password, RU.STRING));
+                    engine.assertFact(signInInput);
+                    
+                    engine.run();
+                    
+                    boolean signInSuccessful = false;
+                    String resultMessage = "";
+                    
+                    // Check the result
+                    Iterator<?> factsResult = engine.listFacts();
+                    while (factsResult.hasNext()) {
+                        Fact fact = (Fact) factsResult.next();
+                        
+                        if (fact.getName().equals("MAIN::sign-in-result")) {
+                            resultMessage = fact.getSlotValue("message").stringValue(null);
+                            signInSuccessful = fact.getSlotValue("valid").equals(Funcall.TRUE);
+                            break;
+                        }
+                    }
+
+                    if (signInSuccessful) {
+                        JOptionPane.showMessageDialog(
+                            this, 
+                            "Sign-in successful!", 
+                            "Success", 
+                            JOptionPane.INFORMATION_MESSAGE
+                        );
+                        addToNavigationStack();
+                        new WelcomePage();
+                        dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(
+                            this, 
+                            resultMessage, 
+                            "Error", 
+                            JOptionPane.ERROR_MESSAGE
+                        );
+                    }
+                } catch (JessException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "An error occurred during sign-in: " + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
             }
         });
         backgroundLabel.add(signInButton);

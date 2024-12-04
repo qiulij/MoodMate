@@ -1,8 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;CHECK THE USERNAME ;;;;;;;;;;;;; 
 (defrule check-valid-username-and-password
     (user-input (username ?u) (password ?p))
-    (test (neq ?u ""))
-    (test (neq ?p ""))
     (test (neq ?u ?p)) ;; Username and password must not match
     (test (>= (str-length ?u) 3))   ;; Username must have at least 3 characters
 =>
@@ -10,9 +8,7 @@
 
 (defrule invalid-username-or-password
     (user-input (username ?u) (password ?p))
-    (or (test (eq ?u ""))
-        (test (eq ?p ""))
-        (test (eq ?u ?p)) ;; Username and password must not be empty or the same
+    (or (test (eq ?u ?p)) ;; Username and password must not be empty or the same
         (test (< (str-length ?u) 3)))      ;; Username has fewer than 3 characters
 =>
     (assert (validation-result (valid FALSE) (message "Invalid input: Username and password must not be the same or empty or username characters must be atleast 3!"))))
