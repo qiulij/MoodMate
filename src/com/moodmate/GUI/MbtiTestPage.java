@@ -1,6 +1,11 @@
 package com.moodmate.GUI;
 import javax.swing.*;
 import javax.swing.event.*;
+import jess.*;
+import java.util.Iterator;
+import jess.Fact;
+import jess.Rete;
+
 import java.awt.*;
 import java.util.Hashtable;
 
@@ -12,6 +17,8 @@ public class MbtiTestPage extends BasePage {
     private static String name="";
     private static int age=0;
     private static String gender="";
+    private JSlider[] mbtiSliders = new JSlider[8];
+    private static int userId = 1; 
     
     int contentWidth= contentArea.getWidth();
     public MbtiTestPage(String username, int age, String gender) {
@@ -42,21 +49,21 @@ public class MbtiTestPage extends BasePage {
 
         // Create Sliders for MBTI preferences
         currentY = addMBTISlider(contentPanel, currentY, 
-                "I feel energized when I’m in a group of people or social setting.");
+                "I feel energized when I'm in a group of people or social setting.", 0);
         currentY = addMBTISlider(contentPanel, currentY, 
-                "I often seek external activities or discussions to recharge after a long day.");
+                "I often seek external activities or discussions to recharge after a long day.", 1);
         currentY = addMBTISlider(contentPanel, currentY, 
-                "I prefer concrete facts and practical details over abstract ideas.");
+                "I prefer concrete facts and practical details over abstract ideas.", 2);
         currentY = addMBTISlider(contentPanel, currentY, 
-                "I trust my direct experiences more than my instincts or hunches.");
+                "I trust my direct experiences more than my instincts or hunches.", 3);
         currentY = addMBTISlider(contentPanel, currentY, 
-                "I make decisions based on logic and objective analysis rather than emotions.");
+                "I make decisions based on logic and objective analysis rather than emotions.", 4);
         currentY = addMBTISlider(contentPanel, currentY,
-                "When resolving conflicts, I focus more on fairness and rules than on harmony and relationships.");
+                "When resolving conflicts, I focus more on fairness and rules than on harmony and relationships.", 5);
         currentY = addMBTISlider(contentPanel, currentY, 
-                "I prefer planning and organization to flexibility and spontaneity.");
+                "I prefer planning and organization to flexibility and spontaneity.", 6);
         currentY = addMBTISlider(contentPanel, currentY, 
-                "I feel more comfortable making decisions early rather than keeping options open.");
+                "I feel more comfortable making decisions early rather than keeping options open.", 7);
 
         currentY += MARGIN;
 
@@ -74,44 +81,83 @@ public class MbtiTestPage extends BasePage {
         
 
         nextButton.addActionListener(e -> {
-            String mbtiResult = "ENFJ"; // Hardcoded MBTI result for now
-
-            // Fetch user details (already passed to MbtiTestPage)
-            String message = "Here are your details:\n" +
-                             "Name: " + username + "\n" +
-                             "Age: " + age + "\n" +
-                             "Gender: " + gender + "\n" +
-                             "MBTI Type: " + mbtiResult;
-
-            // Create options for the dialog
-            String[] options = {"OK", "Edit"};
-            int choice = JOptionPane.showOptionDialog(
-                this, // Parent component
-                message, // Message to display
-                "Your MBTI Result", // Title of the dialog
-                JOptionPane.YES_NO_OPTION, // Option type
-                JOptionPane.INFORMATION_MESSAGE, // Message type
-                null, // Icon (null for default)
-                options, // Button text
-                options[0] // Default button
-            );
-
-            // Handle the user's choice
-            if (choice == 1) { // "Edit" option selected
-            	System.out.println("Navigating to UserProfilePage with:");
-            	System.out.println("Name: " + username);
-            	System.out.println("Age: " + age);
-            	System.out.println("Gender: " + gender);
-
-                new UserProfilePage(username, String.valueOf(age), gender); // Pass current data back
+            try {
+                // Initialize Jess engine
+                Rete engine = new Rete();
+                engine.reset();
+                engine.batch("src/com/moodmate/logic/templates.clp");
+                engine.batch("src/com/moodmate/logic/rules.clp");
+                // Assert profile input
+                String profileAssert = String.format(
+                    "(assert (profile-input (user_id 1) (name \"%s\") (age %d) (gender \"%s\") (mbti \"unknown\")))",
+                    name, age, gender
+                );
+                engine.eval(profileAssert);
                
-                dispose(); // Close the MBTI test page
-            } else if (choice == 0) { // "OK" option selected
-            	addToNavigationStack();
-                new HobbiesPage();
+                // Assert mbti-answer facts using the exact format
+                String[] dimensions = {"EI", "EI", "SN", "SN", "TF", "TF", "JP", "JP"};
+                for (int i = 0; i < mbtiSliders.length; i++) {
+                    String assertCommand = String.format(
+                        "(assert (mbti-answer (user_id 1) (dimension \"%s\") (question_id %d) (score %d)))",
+                        dimensions[i],
+                        (i % 2) + 1,
+                        mbtiSliders[i].getValue()
+                    );
+                    engine.eval(assertCommand);
+                    
+                    // Debug print
+                    System.out.println("Asserting: " + assertCommand);
+                }
 
-                // Close the test page
-                dispose();
+                // Run the rules
+                engine.run();
+
+                // Get the MBTI result
+                String mbtiResult = "UNKNOWN";
+                Iterator<?> facts = engine.listFacts();
+                while (facts.hasNext()) {
+                    Fact fact = (Fact) facts.next();
+                    if (fact.getName().equals("MAIN::profile-input")) {
+                        mbtiResult = fact.getSlotValue("mbti").stringValue(null);
+                        break;
+                    }
+                }
+
+                // Show results dialog
+                String message = String.format(
+                    "Here are your details:\nName: %s\nAge: %d\nGender: %s\nMBTI Type: %s",
+                    username, age, gender, mbtiResult
+                );
+
+                String[] options = {"OK", "Edit"};
+                int choice = JOptionPane.showOptionDialog(
+                    this,
+                    message,
+                    "Your MBTI Result",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    options,
+                    options[0]
+                );
+
+                if (choice == 1) {
+                    new UserProfilePage(username, String.valueOf(age), gender);
+                    dispose();
+                } else if (choice == 0) {
+                    addToNavigationStack();
+                    new HobbiesPage();
+                    dispose();
+                }
+
+            } catch (JessException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Error calculating MBTI result: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
             }
         });
 
@@ -127,7 +173,7 @@ public class MbtiTestPage extends BasePage {
         contentArea.add(scrollPane, BorderLayout.CENTER);
     }
 
-    private int addMBTISlider(JPanel contentPanel, int currentY, String question) {
+    private int addMBTISlider(JPanel contentPanel, int currentY, String question, int index) {
     	
     	JLabel questionLabel1 = new JLabel("<html>" + question + "</html>");
     	questionLabel1.setHorizontalAlignment(SwingConstants.CENTER); // Center align text
@@ -141,7 +187,8 @@ public class MbtiTestPage extends BasePage {
     	currentY += 2 * FIELD_HEIGHT;
 
     	
-        JSlider mbtiSlider = new JSlider(-5, 5, -5);  
+        JSlider mbtiSlider = new JSlider(-5, 5, -5); 
+        mbtiSliders[index] = mbtiSlider;
         mbtiSlider.setBounds(PADDING_X -20, currentY, 300, FIELD_HEIGHT * 2); 
 //        mbtiSlider.setMajorTickSpacing(2);
 //        mbtiSlider.setMinorTickSpacing(1);
@@ -167,7 +214,6 @@ public class MbtiTestPage extends BasePage {
         contentPanel.add(mbtiSlider);
 
 
-        contentPanel.add(mbtiSlider);
 
         currentY += FIELD_HEIGHT + MARGIN*2;
 

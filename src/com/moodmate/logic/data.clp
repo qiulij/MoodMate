@@ -1,6 +1,6 @@
 (assert (user-input (username "john") (password "pass123")))
 (assert (profile-input (user_id 1) (name "Alice") (gender 1)
-                       (age 25) (mbti "INFJ") (hobbies "art relax social collection")
+                       (age 25) (mbti "unknown") (hobbies "art relax social collection")
                        (notification-frequency 2)))
 
 (assert (mbti-answer (user_id 1) (dimension "EI") (question_id 1) (score 3)))
