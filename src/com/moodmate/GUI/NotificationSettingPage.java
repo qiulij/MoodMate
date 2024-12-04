@@ -122,7 +122,7 @@ public class NotificationSettingPage extends BasePage {
                     Rete engine = new Rete();
                     engine.reset();
                     engine.batch("src/com/moodmate/logic/templates.clp");
-                    engine.batch("src/com/moodmate/logic/rules.clp");
+                    engine.batch("src/com/moodmate/logic/user_profile_rules.clp");
 
                     // Assert profile with all information including notification frequency
                     String assertCommand = String.format(
