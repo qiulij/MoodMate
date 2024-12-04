@@ -1,6 +1,10 @@
 package com.moodmate.GUI;
 
 import javax.swing.*;
+
+import jess.JessException;
+import jess.Rete;
+
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -10,6 +14,11 @@ public class HobbiesPage extends BasePage {
     private static final int FIELD_HEIGHT = 30; // Height for the input fields
     private static final int MARGIN = 20; // Vertical margin between components
     private static final int BUTTON_SIZE = 200; // Button size (square dimensions)
+    
+    private final String username;
+    private final int age;
+    private final String gender;
+    private final String mbtiResult;
 
     // Array of hobby image filenames
     private static final String[] HOBBY_IMAGES = {
@@ -21,8 +30,12 @@ public class HobbiesPage extends BasePage {
     // List to keep track of selected hobbies
     private final ArrayList<String> selectedHobbies = new ArrayList<>();
 
-    public HobbiesPage() {
-        super();
+    public HobbiesPage(String username, int age, String gender, String mbtiResult) {
+    	super();
+        this.username = username;
+        this.age = age;
+        this.gender = gender;
+        this.mbtiResult = mbtiResult;
 
         // Create a contentPanel for all components
         JPanel contentPanel = new JPanel();
@@ -112,7 +125,6 @@ public class HobbiesPage extends BasePage {
         
         nextButton.addActionListener(e -> {
             if (selectedHobbies.size() < 2) {
-                // Display a warning message if fewer than 2 hobbies are selected
                 JOptionPane.showMessageDialog(
                     this,
                     "Please select at least two hobbies before proceeding.",
@@ -120,13 +132,45 @@ public class HobbiesPage extends BasePage {
                     JOptionPane.WARNING_MESSAGE
                 );
             } else {
-                // Proceed to the next page
-                addToNavigationStack();
-                new NotificationSettingPage();
-                dispose();
+                try {
+                    // Initialize Jess engine
+                    Rete engine = new Rete();
+                    engine.reset();
+                    engine.batch("src/com/moodmate/logic/templates.clp");
+                    engine.batch("src/com/moodmate/logic/user_profile_rules.clp");
+
+                    // First, assert the profile with all information including hobbies
+                    String hobbiesStr = String.join(" ", selectedHobbies);
+                    
+                    // Create new fact with all information
+                    String assertCommand = String.format(
+                        "(assert (profile-input (user_id 1) (name \"%s\") (gender \"%s\") " +
+                        "(age %d) (mbti \"%s\") (hobbies \"%s\") (notification-frequency 1)))",
+                        username, gender, age, mbtiResult, hobbiesStr
+                    );
+                    
+                    // Debug print
+                    System.out.println("Asserting profile with hobbies: " + assertCommand);
+                    
+                    engine.eval(assertCommand);
+                    engine.run();
+
+                    // Proceed to next page
+                    addToNavigationStack();
+                    new NotificationSettingPage(username, age, gender, mbtiResult, hobbiesStr);
+                    dispose();
+
+                } catch (JessException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Error updating profile with hobbies: " + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
             }
         });
-
         contentPanel.add(nextButton);
         currentY += FIELD_HEIGHT + MARGIN;
 
@@ -137,7 +181,9 @@ public class HobbiesPage extends BasePage {
         contentArea.add(scrollPane, BorderLayout.CENTER);
     }
 
-    public static void main(String[] args) {
-        new HobbiesPage();
+    public HobbiesPage() {
+        this("", 0, "", "");
     }
+    
+  
 }

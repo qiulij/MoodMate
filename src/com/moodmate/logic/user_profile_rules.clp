@@ -48,30 +48,33 @@
     (printout t "Calculated MBTI for user " ?id ": " ?mbti crlf))
 
 
-(defrule validate-notification-frequency
-	(declare (salience 95))
-    (profile-input (user_id ?id) (notification-frequency ?freq))
-    (not (notification-validated))  ; Control fact
-    (test (member$ ?freq (create$ 1 2 3)))
+(defrule update-profile
+    (declare (salience 99))  ; Run this first
+    ?old <- (profile-input (user_id ?id))
+    ?new <- (profile-input (user_id ?id))
+    (test (neq ?old ?new))
 =>
-    (assert (notification-validated))  ; Prevent multiple firings
-    (printout t "User " ?id " will receive notifications every " ?freq " hours." crlf))
+    (retract ?old)
+    (bind ?freq (fact-slot-value ?new notification-frequency))
+    (printout t "Updated notification frequency to: " ?freq " hours" crlf))
 
 (defrule print-profile
-    (declare (salience 94)) ;; Ensure this executes last
+    (declare (salience 94))
     ?profile <- (profile-input (user_id ?id)
-                               (name ?name)
-                               (gender ?gender)
-                               (age ?age)
-                               (mbti ?mbti&:(neq ?mbti nil))
-                               (hobbies ?hobbies)
-                               (notification-frequency ?nf))
+                             (name ?name)
+                             (gender ?gender)
+                             (age ?age)
+                             (mbti ?mbti)
+                             (hobbies ?hobbies)
+                             (notification-frequency ?nf))
 =>
+    (bind ?hobbies-str (if (eq ?hobbies nil) then "none" else ?hobbies))
+    (bind ?nf-str (if (eq ?nf nil) then "not set" else (str-cat ?nf " hours")))
+    
     (printout t "User Profile for ID: " ?id crlf
               "Name: " ?name crlf
               "Gender: " ?gender crlf
               "Age: " ?age crlf
               "MBTI: " ?mbti crlf
-              "Hobbies: " ?hobbies crlf
-              "Notification Frequency: " ?nf))
-
+              "Hobbies: " ?hobbies-str crlf
+              "Notification Frequency: " ?nf-str crlf crlf))

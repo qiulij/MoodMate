@@ -2,6 +2,10 @@ package com.moodmate.GUI;
 
 import javax.swing.*;
 import javax.swing.event.*;
+
+import jess.JessException;
+import jess.Rete;
+
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.Hashtable;
@@ -12,9 +16,19 @@ public class NotificationSettingPage extends BasePage {
     private static final int FIELD_HEIGHT = 30; // Height for the input fields
     private static final int MARGIN = 20; // Vertical margin between components
     int contentWidth = contentArea.getWidth();
-
-    public NotificationSettingPage() {
+    private String username;
+    private int age;
+    private String gender;
+    private String mbtiResult;
+    private String hobbies;
+    
+    public NotificationSettingPage(String username, int age, String gender, String mbtiResult, String hobbies) {
         super();
+        this.username = username;
+        this.age = age;
+        this.gender = gender;
+        this.mbtiResult = mbtiResult;
+        this.hobbies = hobbies;
 
         // Create a contentPanel for all components
         JPanel contentPanel = new JPanel();
@@ -95,9 +109,53 @@ public class NotificationSettingPage extends BasePage {
         nextButton.addActionListener(e -> {
             // Check if any radio button is selected
             if (oneHourButton.isSelected() || twoHourButton.isSelected() || threeHourButton.isSelected()) {
-                addToNavigationStack();
-                // new HomePage(); // Uncomment if you want to navigate to a different page
-                dispose();
+                try {
+                    // Get selected frequency
+                    int frequency = 1; // Default to 1 hour
+                    if (twoHourButton.isSelected()) {
+                        frequency = 2;
+                    } else if (threeHourButton.isSelected()) {
+                        frequency = 3;
+                    }
+
+                    // Initialize Jess engine
+                    Rete engine = new Rete();
+                    engine.reset();
+                    engine.batch("src/com/moodmate/logic/templates.clp");
+                    engine.batch("src/com/moodmate/logic/rules.clp");
+
+                    // Assert profile with all information including notification frequency
+                    String assertCommand = String.format(
+                    	    "(assert (profile-input " +
+                    	    "(user_id 1) " +
+                    	    "(name \"%s\") " +
+                    	    "(gender \"%s\") " +
+                    	    "(age %d) " +
+                    	    "(mbti \"%s\") " +
+                    	    "(hobbies \"%s\") " +
+                    	    "(notification-frequency %d)))",  // Make sure this is included
+                    	    username, gender, age, mbtiResult, hobbies, frequency
+                    	);
+                    
+                    System.out.println("Updating profile with notification frequency: " + assertCommand);
+                    
+                    engine.eval(assertCommand);
+                    engine.run();
+
+                    // Proceed to next page
+                    addToNavigationStack();
+                    new SignInPage();
+                    dispose();
+
+                } catch (JessException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Error updating notification settings: " + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
             } else {
                 // Show a warning dialog if no option is selected
                 JOptionPane.showMessageDialog(
@@ -108,7 +166,6 @@ public class NotificationSettingPage extends BasePage {
                 );
             }
         });
-
         contentPanel.add(nextButton);
 
         currentY += MARGIN;
@@ -120,7 +177,7 @@ public class NotificationSettingPage extends BasePage {
         contentArea.add(scrollPane, BorderLayout.CENTER);
     }
 
-    public static void main(String[] args) {
-        new NotificationSettingPage();
+    public NotificationSettingPage() {
+        this("", 0, "", "", "");
     }
 }

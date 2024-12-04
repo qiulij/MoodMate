@@ -86,7 +86,7 @@ public class MbtiTestPage extends BasePage {
                 Rete engine = new Rete();
                 engine.reset();
                 engine.batch("src/com/moodmate/logic/templates.clp");
-                engine.batch("src/com/moodmate/logic/rules.clp");
+                engine.batch("src/com/moodmate/logic/user_profile_rules.clp");
                 // Assert profile input
                 String profileAssert = String.format(
                     "(assert (profile-input (user_id 1) (name \"%s\") (age %d) (gender \"%s\") (mbti \"unknown\")))",
@@ -146,7 +146,7 @@ public class MbtiTestPage extends BasePage {
                     dispose();
                 } else if (choice == 0) {
                     addToNavigationStack();
-                    new HobbiesPage();
+                    new HobbiesPage(username, age, gender, mbtiResult);
                     dispose();
                 }
 
