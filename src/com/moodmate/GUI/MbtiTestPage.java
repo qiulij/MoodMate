@@ -21,11 +21,11 @@ public class MbtiTestPage extends BasePage {
     private static int userId = 1; 
     
     int contentWidth= contentArea.getWidth();
-    public MbtiTestPage(String username, int age, String gender) {
+    public MbtiTestPage(String username, int age, int gender) {
         super(); // Call BasePage setup
         this.name = username;
         this.age = age;
-        this.gender = gender;
+        this.gender = gender == 1 ? "Male" : gender == 2 ? "Female" : "Prefer not to say";
         // Create a contentPanel for all components
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(null); // Absolute positioning
@@ -89,9 +89,9 @@ public class MbtiTestPage extends BasePage {
                 engine.batch("src/com/moodmate/logic/user_profile_rules.clp");
                 // Assert profile input
                 String profileAssert = String.format(
-                    "(assert (profile-input (user_id 1) (name \"%s\") (age %d) (gender \"%s\") (mbti \"unknown\")))",
-                    name, age, gender
-                );
+                	    "(assert (profile-input (user_id 1) (name \"%s\") (age %d) (gender %d) (mbti \"unknown\")))",
+                	    name, age, gender
+                	);
                 engine.eval(profileAssert);
                
                 // Assert mbti-answer facts using the exact format
@@ -221,6 +221,6 @@ public class MbtiTestPage extends BasePage {
     }
 
     public static void main(String[] args) {
-        new MbtiTestPage("test",0,"female");
+        new MbtiTestPage("test",0,0);
     }
 }

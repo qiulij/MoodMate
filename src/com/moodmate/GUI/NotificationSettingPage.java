@@ -22,11 +22,11 @@ public class NotificationSettingPage extends BasePage {
     private String mbtiResult;
     private String hobbies;
     
-    public NotificationSettingPage(String username, int age, String gender, String mbtiResult, String hobbies) {
+    public NotificationSettingPage(String username, int age, int gender, String mbtiResult, String hobbies) {
         super();
         this.username = username;
         this.age = age;
-        this.gender = gender;
+        this.gender = gender == 1 ? "Male" : gender == 2 ? "Female" : "Prefer not to say";
         this.mbtiResult = mbtiResult;
         this.hobbies = hobbies;
 
@@ -129,11 +129,11 @@ public class NotificationSettingPage extends BasePage {
                     	    "(assert (profile-input " +
                     	    "(user_id 1) " +
                     	    "(name \"%s\") " +
-                    	    "(gender \"%s\") " +
+                    	    "(gender %d) " +
                     	    "(age %d) " +
                     	    "(mbti \"%s\") " +
                     	    "(hobbies \"%s\") " +
-                    	    "(notification-frequency %d)))",  // Make sure this is included
+                    	    "(notification-frequency %d)))",
                     	    username, gender, age, mbtiResult, hobbies, frequency
                     	);
                     
@@ -178,6 +178,6 @@ public class NotificationSettingPage extends BasePage {
     }
 
     public NotificationSettingPage() {
-        this("", 0, "", "", "");
+        this("", 0, 0, "", "");
     }
 }

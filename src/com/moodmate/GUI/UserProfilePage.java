@@ -18,19 +18,19 @@ public class UserProfilePage extends BasePage {
     private JRadioButton maleButton;
     private JRadioButton femaleButton;
     private JRadioButton preferNotToSayButton;
+    private JSlider eiSlider, snSlider, tfSlider, jpSlider;
     
-    
-    public UserProfilePage(String username, String age, String gender) {
+    public UserProfilePage(String username, String age, int gender) {
 
     	this();
         // Pre-fill the fields with the provided data
         usernameField.setText(username);
         ageField.setText(age); // This works because ageField is now a JFormattedTextField
-        if (gender.equals("Male")) {
+        if (gender == 1) {
             maleButton.setSelected(true);
-        } else if (gender.equals("Female")) {
+        } else if (gender == 2) {
             femaleButton.setSelected(true);
-        } else if (gender.equals("Prefer not to say")) {
+        } else if (gender == 0) {
             preferNotToSayButton.setSelected(true);
         }
     }
@@ -177,11 +177,11 @@ public class UserProfilePage extends BasePage {
                 return; // Stop further processing
             }
 
-            String gender = maleButton.isSelected() ? "Male" : 
-                            femaleButton.isSelected() ? "Female" : 
-                            preferNotToSayButton.isSelected() ? "Prefer not to say" : "";
+            int gender = maleButton.isSelected() ? 1 : 
+                femaleButton.isSelected() ? 2 : 
+                preferNotToSayButton.isSelected() ? 0 : -1;
 
-            if (username.isEmpty() || gender.isEmpty()) {
+            if (username.isEmpty() || gender == -1) {
                 JOptionPane.showMessageDialog(
                     contentPanel,
                     "Please fill out all required fields (Name, Age, and Gender).",
@@ -226,8 +226,8 @@ public class UserProfilePage extends BasePage {
         nextButton.setOpaque(true);
         nextButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));    
         
+     // Modify the nextButton action listener
         nextButton.addActionListener(e -> {
-        	
             String username = usernameField.getText().trim();
             String ageText = ageField.getText().trim();
             int age = -1;
@@ -235,31 +235,30 @@ public class UserProfilePage extends BasePage {
             try {
                 age = Integer.parseInt(ageText);
             } catch (NumberFormatException ex) {
-                // Show error if age is not a valid integer
                 JOptionPane.showMessageDialog(
                     contentPanel,
                     "Please enter a valid age.",
                     "Invalid Age",
                     JOptionPane.ERROR_MESSAGE
                 );
-                return; // Stop further processing
+                return;
             }
 
-            String gender = maleButton.isSelected() ? "Male" : 
-                            femaleButton.isSelected() ? "Female" : 
-                            preferNotToSayButton.isSelected() ? "Prefer not to say" : "";
+            int gender = maleButton.isSelected() ? 1 : 
+                         femaleButton.isSelected() ? 2 : 
+                         preferNotToSayButton.isSelected() ? 0 : -1;
 
-            if (username.isEmpty() || gender.isEmpty()) {
+            if (username.isEmpty() || gender == -1) {
                 JOptionPane.showMessageDialog(
                     contentPanel,
                     "Please fill out all required fields (Name, Age, and Gender).",
                     "Incomplete Profile",
                     JOptionPane.WARNING_MESSAGE
                 );
-
             } else {
+                String mbtiResult = calculateMBTI();
                 addToNavigationStack();
-                new HobbiesPage();
+                new HobbiesPage(username, age, gender, mbtiResult);
                 dispose();
             }
         });
@@ -273,24 +272,51 @@ public class UserProfilePage extends BasePage {
         contentArea.add(scrollPane, BorderLayout.CENTER);
     }
 
-    private int addMBTISlider(JPanel contentPanel, int currentY, String label0,String label100, int paddingX) {
-
-        JSlider mbtiSlider = new JSlider(0, 100, 50);  // 0 is one extreme, 100 is the other
-        mbtiSlider.setBounds(paddingX, currentY, 250, FIELD_HEIGHT*2); // Adjust slider width
+ // Modify the addMBTISlider method to store slider references
+    private int addMBTISlider(JPanel contentPanel, int currentY, String label0, String label100, int paddingX) {
+        JSlider mbtiSlider = new JSlider(0, 100, 50);
+        mbtiSlider.setBounds(paddingX, currentY, 250, FIELD_HEIGHT*2);
         mbtiSlider.setMajorTickSpacing(20);
         mbtiSlider.setMinorTickSpacing(5);
         Hashtable<Integer, JLabel> labels = new Hashtable<>();
         labels.put(0, new JLabel(label0));
         labels.put(100, new JLabel(label100));
         mbtiSlider.setLabelTable(labels);  
-//        mbtiSlider.setPaintTicks(true);
         mbtiSlider.setPaintLabels(true);
 
+        // Store the slider reference
+        if (label0.contains("Introvert")) {
+            eiSlider = mbtiSlider;
+        } else if (label0.contains("Sensing")) {
+            snSlider = mbtiSlider;
+        } else if (label0.contains("Thinking")) {
+            tfSlider = mbtiSlider;
+        } else if (label0.contains("Judging")) {
+            jpSlider = mbtiSlider;
+        }
+
         contentPanel.add(mbtiSlider);
-
         currentY += FIELD_HEIGHT + MARGIN;
-
         return currentY;
+    }
+    
+ // Add helper method to calculate MBTI
+    private String calculateMBTI() {
+        StringBuilder mbti = new StringBuilder();
+        
+        // E/I preference
+        mbti.append(eiSlider.getValue() > 50 ? "E" : "I");
+        
+        // S/N preference
+        mbti.append(snSlider.getValue() > 50 ? "N" : "S");
+        
+        // T/F preference
+        mbti.append(tfSlider.getValue() > 50 ? "F" : "T");
+        
+        // J/P preference
+        mbti.append(jpSlider.getValue() > 50 ? "P" : "J");
+        
+        return mbti.toString();
     }
 
     public static void main(String[] args) {

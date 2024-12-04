@@ -30,11 +30,11 @@ public class HobbiesPage extends BasePage {
     // List to keep track of selected hobbies
     private final ArrayList<String> selectedHobbies = new ArrayList<>();
 
-    public HobbiesPage(String username, int age, String gender, String mbtiResult) {
+    public HobbiesPage(String username, int age, int gender, String mbtiResult) {
     	super();
         this.username = username;
         this.age = age;
-        this.gender = gender;
+        this.gender = gender == 1 ? "Male" : gender == 2 ? "Female" : "Prefer not to say";
         this.mbtiResult = mbtiResult;
 
         // Create a contentPanel for all components
@@ -144,10 +144,10 @@ public class HobbiesPage extends BasePage {
                     
                     // Create new fact with all information
                     String assertCommand = String.format(
-                        "(assert (profile-input (user_id 1) (name \"%s\") (gender \"%s\") " +
-                        "(age %d) (mbti \"%s\") (hobbies \"%s\") (notification-frequency 1)))",
-                        username, gender, age, mbtiResult, hobbiesStr
-                    );
+                    	    "(assert (profile-input (user_id 1) (name \"%s\") (gender %d) " +
+                    	    "(age %d) (mbti \"%s\") (hobbies \"%s\") (notification-frequency 1)))",
+                    	    username, gender, age, mbtiResult, hobbiesStr
+                    	);
                     
                     // Debug print
                     System.out.println("Asserting profile with hobbies: " + assertCommand);
@@ -182,7 +182,7 @@ public class HobbiesPage extends BasePage {
     }
 
     public HobbiesPage() {
-        this("", 0, "", "");
+        this("", 0, 0, "");
     }
     
   
