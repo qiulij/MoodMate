@@ -122,7 +122,7 @@ public class SignInPage extends BasePage {
                             JOptionPane.INFORMATION_MESSAGE
                         );
                         addToNavigationStack();
-                        new WelcomePage();
+                        new HomePage();
                         dispose();
                     } else {
                         JOptionPane.showMessageDialog(
