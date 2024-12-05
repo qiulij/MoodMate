@@ -38,6 +38,7 @@ A Knowledge-Based Emotion Tracker for Self-Regulation and Early Detection of Men
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/qiulij/MoodMate.git
+   ```bash
    cd MoodMate
 2. **Set Up Required Libraries:** \
    Download the following .jar files and add them to your project's classpath:
