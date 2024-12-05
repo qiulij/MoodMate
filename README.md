@@ -50,16 +50,16 @@ A Knowledge-Based Emotion Tracker for Self-Regulation and Early Detection of Men
 
 ## Database Setup
 1. Run the SQL Scripts in MySQL
-   -- Authentication table
-CREATE TABLE IF NOT EXISTS Authentication (
+    -- Authentication table
+    CREATE TABLE IF NOT EXISTS Authentication (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL
-);
+    );
 
--- User_Info table
-CREATE TABLE IF NOT EXISTS User_Info (
+    -- User_Info table
+    CREATE TABLE IF NOT EXISTS User_Info (
     user_id INT PRIMARY KEY,
     name VARCHAR(50),
     gender TINYINT,
@@ -67,10 +67,10 @@ CREATE TABLE IF NOT EXISTS User_Info (
     mbti VARCHAR(4),
     hobbies TEXT,
     self_image_score DECIMAL(5,2)
-);
+    );
 
--- Daily_Record table
-CREATE TABLE IF NOT EXISTS Daily_Record (
+    -- Daily_Record table
+    CREATE TABLE IF NOT EXISTS Daily_Record (
     user_id INT NOT NULL,
     record_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     happy_score DECIMAL(5,2),
@@ -86,4 +86,4 @@ CREATE TABLE IF NOT EXISTS Daily_Record (
     weather_temperature DECIMAL(5,2),
     triggers_of_day TEXT,
     PRIMARY KEY (user_id, record_date)
-);
+    );
