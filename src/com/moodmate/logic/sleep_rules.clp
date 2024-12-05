@@ -9,7 +9,6 @@
 ; Rule to analyze sleep quality when user is sleepy
 (defrule analyze-sleep-quality
     (declare (salience 85))
-    (need-second-factors (user_id ?id) (need TRUE))
     (sleepiness (user_id ?id) (sleepy TRUE))
     ?sleep <- (sleep-quality (user_id ?id) 
                           (satisfaction ?sat)
@@ -133,7 +132,6 @@
 ; Rule when user is not sleepy
 (defrule analyze-non-sleepy
     (declare (salience 84))
-    (need-second-factors (user_id ?id) (need TRUE))
     (sleepiness (user_id ?id) (sleepy FALSE))
 =>
     (assert (sleep-recommendation 

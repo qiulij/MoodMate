@@ -2,18 +2,37 @@ package com.moodmate.GUI;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import jess.JessException;
+import jess.Rete;
+
 import java.awt.*;
 import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import jess.*;
 
 public class SleepPage extends BaseHomePage {
 
     private static final int PADDING_X = 40; // Horizontal padding for fields
     private static final int FIELD_HEIGHT = 30; // Height for input fields
     private static final int MARGIN = 10; // Vertical margin between components
-
+    private static final int userId = 1;
+    private Rete engine;
+    
     public SleepPage() {
         super();
-
+        try {
+            // Initialize Jess engine once at page creation
+            engine = new Rete();
+            engine.reset();
+            engine.batch("src/com/moodmate/logic/templates.clp");
+            engine.batch("src/com/moodmate/logic/sleep_rules.clp");
+            engine.eval("(assert (need-second-factors (user_id 1) (need TRUE)))");
+        } catch (JessException ex) {
+            ex.printStackTrace();
+        }
+        
         // Set the background of the page to an image
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(null); // Absolute positioning
@@ -118,8 +137,53 @@ public class SleepPage extends BaseHomePage {
         contentPanel.add(sleepDetailsPanel);
 
         // Listener for "Yes" button to show details panel
-        yesButton.addActionListener(e -> sleepDetailsPanel.setVisible(true));
-        noButton.addActionListener(e -> sleepDetailsPanel.setVisible(false));
+        yesButton.addActionListener(e -> {
+            try {
+                // Assert sleepiness fact
+                String sleepinessCommand = String.format(
+                    "(assert (sleepiness (user_id %d) (sleepy TRUE)))",
+                    userId
+                );
+                System.out.println("Asserting sleepiness: " + sleepinessCommand);
+                engine.eval(sleepinessCommand);
+                engine.run();
+
+                // Show the details panel
+                sleepDetailsPanel.setVisible(true);
+
+            } catch (JessException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Error processing sleepiness status: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
+        noButton.addActionListener(e -> {
+            try {
+                String sleepinessCommand = String.format(
+                    "(assert (sleepiness (user_id %d) (sleepy FALSE)))",
+                    userId
+                );
+                System.out.println("Asserting sleepiness: " + sleepinessCommand);
+                engine.eval(sleepinessCommand);
+                engine.run();
+
+                // Hide the details panel
+                sleepDetailsPanel.setVisible(false);
+
+            } catch (JessException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Error processing sleepiness status: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
 
         currentY += sleepDetailsPanel.getHeight() + MARGIN;
 
@@ -133,12 +197,88 @@ public class SleepPage extends BaseHomePage {
         nextButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         
         nextButton.addActionListener(e -> {
-       	 addToNavigationStack();
-            new PhysicalActivityPage();
-            dispose();
-       	
-           // Handle navigation to the next page
-       });
+            try {
+                // Check if sleep option is selected
+                if (!yesButton.isSelected() && !noButton.isSelected()) {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Please indicate if you are sleepy.",
+                        "Input Required",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                    return;
+                }
+
+                // If yes is selected, validate sleep details
+                if (yesButton.isSelected()) {
+                    if (!veryGoodButton.isSelected() && !fairlyGoodButton.isSelected() && 
+                        !needsImprovementButton.isSelected() && !poorButton.isSelected()) {
+                        JOptionPane.showMessageDialog(
+                            this,
+                            "Please rate your sleep quality.",
+                            "Input Required",
+                            JOptionPane.WARNING_MESSAGE
+                        );
+                        return;
+                    }
+                }
+
+                if (yesButton.isSelected()) {
+                    // Get satisfaction level
+                    int satisfaction;
+                    if (veryGoodButton.isSelected()) satisfaction = 3;
+                    else if (fairlyGoodButton.isSelected()) satisfaction = 2;
+                    else if (needsImprovementButton.isSelected()) satisfaction = 1;
+                    else satisfaction = 0;
+
+                    // Get times from spinners
+                    Date sleepTime = (Date) sleepTimeSpinner.getValue();
+                    Date wakeTime = (Date) wakeTimeSpinner.getValue();
+
+                    // Format times as strings (HH:mm)
+                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                    String sleepTimeStr = sdf.format(sleepTime);
+                    String wakeTimeStr = sdf.format(wakeTime);
+
+                    // Convert times to decimal
+                    double sleepDecimal = convertTimeToDecimal(sleepTime);
+                    double wakeDecimal = convertTimeToDecimal(wakeTime);
+
+                    // Assert sleep quality fact
+                    String sleepQualityCommand = String.format(
+                        "(assert (sleep-quality " +
+                        "(user_id %d) " +
+                        "(satisfaction %d) " +
+                        "(sleep-time \"%s\") " +
+                        "(wake-time \"%s\") " +
+                        "(sleep-decimal %.2f) " +
+                        "(wake-decimal %.2f)))",
+                        userId, satisfaction, sleepTimeStr, wakeTimeStr, 
+                        sleepDecimal, wakeDecimal
+                    );
+
+                    System.out.println("Asserting sleep quality: " + sleepQualityCommand);
+                    engine.eval(sleepQualityCommand);
+                    engine.run();
+                }
+
+                // Continue to next page
+                addToNavigationStack();
+                new PhysicalActivityPage();
+                dispose();
+
+            } catch (JessException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Error processing sleep data: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
+
+        
 
         contentPanel.add(nextButton);
 
@@ -148,7 +288,14 @@ public class SleepPage extends BaseHomePage {
 
         contentArea.add(scrollPane, BorderLayout.CENTER);
     }
-
+    // Add helper method to convert time to decimal
+    private double convertTimeToDecimal(Date time) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(time);
+        int hours = cal.get(Calendar.HOUR_OF_DAY);
+        int minutes = cal.get(Calendar.MINUTE);
+        return hours + (minutes / 60.0);
+    }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(SleepPage::new);
     }
