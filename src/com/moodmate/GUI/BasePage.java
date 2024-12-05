@@ -119,15 +119,31 @@ public abstract class BasePage extends JFrame {
         menuBar.setBounds(FRAME_WIDTH, 0, MENU_BAR_WIDTH, FRAME_HEIGHT - STATUS_BAR_HEIGHT - NAV_BAR_HEIGHT);
         menuBar.setLayout(new BoxLayout(menuBar, BoxLayout.Y_AXIS));
 
+        menuBar.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 10)); // Top, Left, Bottom, Right
+
+        
+        
+        JLabel userProfile= new JLabel("User Profile");
+        userProfile.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                new UserProfilePage(); 
+                dispose();
+            }
+        });
         // Add some test content to the menu bar
-        menuBar.add(new JLabel("Menu Item 1"));
-        menuBar.add(Box.createVerticalStrut(10)); // Spacing between items
-        menuBar.add(new JLabel("Menu Item 2"));
-        menuBar.add(Box.createVerticalStrut(10));
-        menuBar.add(new JLabel("Menu Item 3"));
+        menuBar.add(userProfile);
+        menuBar.add(Box.createVerticalStrut(20)); // Spacing between items
+        menuBar.add(new JLabel("Setting"));
+        menuBar.add(Box.createVerticalStrut(20));
+        menuBar.add(new JLabel("AboutUs"));
+        
+      
+        
 
         // Add the menuBar to the JLayeredPane on the PALETTE_LAYER
         layeredPane.add(menuBar, JLayeredPane.PALETTE_LAYER);
+        
 
         // -------- Navigation Bar --------
         navigationBar = new JPanel();
