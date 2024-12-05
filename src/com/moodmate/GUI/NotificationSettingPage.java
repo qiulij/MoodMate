@@ -3,11 +3,17 @@ package com.moodmate.GUI;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import com.moodmate.GUI.SignInPage.GlobalVariable;
+
 import jess.JessException;
 import jess.Rete;
 
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Hashtable;
 
 public class NotificationSettingPage extends BasePage {
@@ -16,14 +22,17 @@ public class NotificationSettingPage extends BasePage {
     private static final int FIELD_HEIGHT = 30; // Height for the input fields
     private static final int MARGIN = 20; // Vertical margin between components
     int contentWidth = contentArea.getWidth();
+    private int userID;
     private String username;
     private int age;
     private String gender;
     private String mbtiResult;
     private String hobbies;
+    int frequency =0 ;
     
-    public NotificationSettingPage(String username, int age, int gender, String mbtiResult, String hobbies) {
+    public NotificationSettingPage(int userID,String username, int age, int gender, String mbtiResult, String hobbies) {
         super();
+        this.userID = userID;
         this.username = username;
         this.age = age;
         this.gender = gender == 1 ? "Male" : gender == 2 ? "Female" : "Prefer not to say";
@@ -104,6 +113,7 @@ public class NotificationSettingPage extends BasePage {
         nextButton.setOpaque(true);
         nextButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
+       // int frequency;
         
 
         nextButton.addActionListener(e -> {
@@ -111,7 +121,7 @@ public class NotificationSettingPage extends BasePage {
             if (oneHourButton.isSelected() || twoHourButton.isSelected() || threeHourButton.isSelected()) {
                 try {
                     // Get selected frequency
-                    int frequency = 1; // Default to 1 hour
+                    	frequency = 1; // Default to 1 hour
                     if (twoHourButton.isSelected()) {
                         frequency = 2;
                     } else if (threeHourButton.isSelected()) {
@@ -127,14 +137,14 @@ public class NotificationSettingPage extends BasePage {
                     // Assert profile with all information including notification frequency
                     String assertCommand = String.format(
                     	    "(assert (profile-input " +
-                    	    "(user_id 1) " +
+                    	    "(user_id %d) " +
                     	    "(name \"%s\") " +
                     	    "(gender %d) " +
                     	    "(age %d) " +
                     	    "(mbti \"%s\") " +
                     	    "(hobbies \"%s\") " +
                     	    "(notification-frequency %d)))",
-                    	    username, gender, age, mbtiResult, hobbies, frequency
+                    	    GlobalVariable.userId, username, gender, age, mbtiResult, hobbies, frequency
                     	);
                     
                     System.out.println("Updating profile with notification frequency: " + assertCommand);
@@ -165,6 +175,39 @@ public class NotificationSettingPage extends BasePage {
                     JOptionPane.WARNING_MESSAGE
                 );
             }
+            try (Connection connection = DriverManager.getConnection(
+            		"jdbc:mysql://localhost:3306/moodmate", "root", "17Aug1993")) {
+
+                // Prepare SQL query
+                String sql = "INSERT INTO user_info (user_id, name, age, gender, mbti, hobbies, notification) "
+                           + "VALUES (?, ?, ?, ?, ?, ?, ?) "
+                           + "ON DUPLICATE KEY UPDATE "
+                           + "user_id = VALUES(user_id), name = VALUES(name), age = VALUES(age), gender = VALUES(gender), "
+                           + "mbti = VALUES(mbti), hobbies = VALUES(hobbies), notification = VALUES(notification)";
+               // int genderString= gender =="Male" ? 1  : gender == "Female" ? 2 : "Prefer not to say";
+                try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                    statement.setInt(1, userID);
+                    statement.setString(2, username);
+                    statement.setInt(3, age);
+                    statement.setInt(4, gender);
+                    statement.setString(5, mbtiResult);
+                    statement.setString(6, hobbies);
+                    statement.setInt(7, frequency);
+
+                    // Execute update
+                    int rowsAffected = statement.executeUpdate();
+                    System.out.println(rowsAffected + " row(s) updated in the database.");
+                }
+
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Error saving notification settings to the database: " + ex.getMessage(),
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
         });
         contentPanel.add(nextButton);
 
@@ -178,6 +221,6 @@ public class NotificationSettingPage extends BasePage {
     }
 
     public NotificationSettingPage() {
-        this("", 0, 0, "", "");
+        this(0,"", 0, 0, "", "");
     }
 }

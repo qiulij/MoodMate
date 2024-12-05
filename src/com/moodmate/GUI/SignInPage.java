@@ -7,11 +7,13 @@ import com.moodmate.database.DatabaseConnection;
 import com.moodmate.logic.User;
 import java.util.List;
 import jess.*;
+import com.moodmate.database.*;
 
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.Iterator;
+
 
 public class SignInPage extends BasePage {
 
@@ -121,6 +123,9 @@ public class SignInPage extends BasePage {
                             "Success", 
                             JOptionPane.INFORMATION_MESSAGE
                         );
+                        //Getting user id from username
+                        GlobalVariable.userId = DatabaseConnection.getUserIdByUsername(username);
+                        System.out.println("User ID for username '" + username + "': " + GlobalVariable.userId);
                         addToNavigationStack();
                         new HomePage();
                         dispose();
@@ -204,4 +209,10 @@ public class SignInPage extends BasePage {
     public static void main(String[] args) {
         new SignInPage();
     }
+    public class GlobalVariable {
+        // Declare a public static variable
+        public static int userId;
+    }
+
 }
+

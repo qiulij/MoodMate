@@ -6,22 +6,34 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="C:/Users/qiuli/Downloads/gson-2.8.8.jar">
+=======
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jess">
+>>>>>>> origin/aqsa
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="C:/Users/qiuli/Downloads/Jess71a1/Jess71a1/eclipse/gov.sandia.jess_7.0.0/plugins/gov.sandia.jess_7.0.0/jsr94.jar">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="C:/Users/qiuli/Downloads/Jess71a1/Jess71a1/eclipse/gov.sandia.jess_7.0.0/plugins/gov.sandia.jess_7.0.0/jess.jar">
+=======
+	<classpathentry kind="lib" path="C:/Users/aqsaf/Downloads/mysql-connector-j-9.1.0/mysql-connector-j-9.1.0/mysql-connector-j-9.1.0.jar">
+>>>>>>> origin/aqsa
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="C:/Users/qiuli/Downloads/mysql-connector-j-9.1.0/mysql-connector-j-9.1.0/mysql-connector-j-9.1.0.jar">
+=======
+	<classpathentry kind="lib" path="C:/Users/aqsaf/Downloads/gson-2.8.8.jar">
+>>>>>>> origin/aqsa
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>

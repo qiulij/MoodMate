@@ -1,6 +1,9 @@
 package com.moodmate.GUI;
 import javax.swing.*;
 import javax.swing.event.*;
+
+import com.moodmate.GUI.SignInPage.GlobalVariable;
+
 import jess.*;
 import java.util.Iterator;
 import jess.Fact;
@@ -89,8 +92,8 @@ public class MbtiTestPage extends BasePage {
                 engine.batch("src/com/moodmate/logic/user_profile_rules.clp");
                 // Assert profile input
                 String profileAssert = String.format(
-                	    "(assert (profile-input (user_id 1) (name \"%s\") (age %d) (gender %d) (mbti \"unknown\")))",
-                	    name, age, gender
+                	    "(assert (profile-input (user_id %d) (name \"%s\") (age %d) (gender %d) (mbti \"unknown\")))",
+                	    GlobalVariable.userId,name, age, gender
                 	);
                 engine.eval(profileAssert);
                
@@ -98,7 +101,7 @@ public class MbtiTestPage extends BasePage {
                 String[] dimensions = {"EI", "EI", "SN", "SN", "TF", "TF", "JP", "JP"};
                 for (int i = 0; i < mbtiSliders.length; i++) {
                     String assertCommand = String.format(
-                        "(assert (mbti-answer (user_id 1) (dimension \"%s\") (question_id %d) (score %d)))",
+                        "(assert (mbti-answer (user_id %d) (dimension \"%s\") (question_id %d) (score %d)))",
                         dimensions[i],
                         (i % 2) + 1,
                         mbtiSliders[i].getValue()
