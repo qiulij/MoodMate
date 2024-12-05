@@ -6,22 +6,22 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="/Users/mahsaaghazadeh/Desktop/Kowledge_based_system_design/mysql-connector-j-9.1.0/mysql-connector-j-9.1.0.jar">
+	<classpathentry kind="lib" path="C:/Users/qiuli/Downloads/gson-2.8.8.jar">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/mahsaaghazadeh/Desktop/Kowledge_based_system_design/Jess71a1/lib/jsr94.jar">
+	<classpathentry kind="lib" path="C:/Users/qiuli/Downloads/Jess71a1/Jess71a1/eclipse/gov.sandia.jess_7.0.0/plugins/gov.sandia.jess_7.0.0/jsr94.jar">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/mahsaaghazadeh/Desktop/Kowledge_based_system_design/Jess71a1/lib/jess.jar">
+	<classpathentry kind="lib" path="C:/Users/qiuli/Downloads/Jess71a1/Jess71a1/eclipse/gov.sandia.jess_7.0.0/plugins/gov.sandia.jess_7.0.0/jess.jar">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/mahsaaghazadeh/eclipse-workspace/MoodMate/gson-2.8.8.jar">
+	<classpathentry kind="lib" path="C:/Users/qiuli/Downloads/mysql-connector-j-9.1.0/mysql-connector-j-9.1.0/mysql-connector-j-9.1.0.jar">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>

@@ -2,8 +2,14 @@ package com.moodmate.GUI;
 
 import javax.swing.*;
 import javax.swing.event.*;
+
+import jess.Fact;
+import jess.JessException;
+import jess.Rete;
+
 import java.awt.*;
 import java.util.Hashtable;
+import java.util.Iterator;
 
 public class EFTPage extends BaseHomePage {
 
@@ -14,7 +20,11 @@ public class EFTPage extends BaseHomePage {
     private static final int CORNER_RADIUS = 25; // Rounded corner radius
 
     private final Hashtable<String, String[]> emotionAdj;
-
+    private final Hashtable<String, JSlider> emotionSliders = new Hashtable<>();
+    private static final int userId = 1; // You might want to pass this from previous pages
+    private static final int day = 1;    // These could come from system time
+    private static final int hour = 8;   // These could come from system time
+    
     public EFTPage() {
         super();
         JLabel backgroundLabel = new JLabel(new ImageIcon("assets/images/background.png"));
@@ -57,12 +67,55 @@ public class EFTPage extends BaseHomePage {
         nextButton.setOpaque(true);
         nextButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
+     // Modify the nextButton action listener
         nextButton.addActionListener(e -> {
-        	 addToNavigationStack();
-             new PrimaryFactorPage();
-             dispose();
-        	
-            // Handle navigation to the next page
+            try {
+                // Initialize Jess engine
+                Rete engine = new Rete();
+                engine.reset();
+                engine.batch("src/com/moodmate/logic/templates.clp");
+                engine.batch("src/com/moodmate/logic/EFT_rules.clp");
+
+                // Assert each emotion's intensity
+                for (String emotion : emotionAdj.keySet()) {
+                    JSlider slider = emotionSliders.get(emotion.toLowerCase());
+                    String assertCommand = String.format(
+                        "(assert (user-emotion (user_id %d) (day %d) (hour %d) " +
+                        "(emotion-name \"%s\") (intensity %d)))",
+                        userId, day, hour, emotion.toLowerCase(), slider.getValue()
+                    );
+                    System.out.println("Asserting: " + assertCommand); // Debug print
+                    engine.eval(assertCommand);
+                }
+
+                // Run the rules
+                engine.run();
+
+                // Print normalized emotions from Jess (optional)
+                Iterator<?> facts = engine.listFacts();
+                while (facts.hasNext()) {
+                    Fact fact = (Fact) facts.next();
+                    if (fact.getName().equals("MAIN::normalized-emotion")) {
+                        System.out.println("Normalized emotion: " + 
+                            fact.getSlotValue("emotion-name") + " = " +
+                            fact.getSlotValue("percentage") + "%");
+                    }
+                }
+
+                // Navigate to next page
+                addToNavigationStack();
+                new PrimaryFactorPage();
+                dispose();
+
+            } catch (JessException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Error processing emotions: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
         });
 
         contentPanel.add(nextButton);
@@ -110,7 +163,10 @@ public class EFTPage extends BaseHomePage {
         intensitySlider.setBounds(20, innerY, emotionBox.getWidth() - 40, FIELD_HEIGHT + 20);
         intensitySlider.setPaintTicks(true);
         intensitySlider.setPaintLabels(true);
-
+        
+        // Store the slider reference
+        emotionSliders.put(emotion.toLowerCase(), intensitySlider);
+        
         // Custom labels for slider
         Hashtable<Integer, JLabel> labels = new Hashtable<>();
         labels.put(0, new JLabel("Low"));
@@ -123,7 +179,7 @@ public class EFTPage extends BaseHomePage {
 
         // Update the global currentY to account for the height of the RoundedPanel and margin
         currentY += BOX_HEIGHT + MARGIN;
-
+        
         return currentY;
     }
 

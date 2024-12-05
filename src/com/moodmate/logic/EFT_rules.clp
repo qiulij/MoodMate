@@ -11,7 +11,6 @@
 ; Calculate total intensity with user_id
 (defrule calculate-total-intensity
     (declare (salience 92))
-    (profile-input (user_id ?id))
     ?user-emotion <- (user-emotion (user_id ?id) (day ?d) (hour ?h))
     (not (total-intensity (user_id ?id) (day ?d) (hour ?h)))  ; Fixed the not syntax
 

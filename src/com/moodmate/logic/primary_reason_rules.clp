@@ -1,7 +1,48 @@
+
+; Calculate RSES score and categorize it
+(defrule calculate-rses-score
+    (declare (salience 88))
+    (profile-input (user_id ?id))
+    (not (rses-score (user_id ?id)))  ; Haven't calculated for this user
+    (self-image-answer (user_id ?id) (question_id 1) (answer ?a1))
+    (self-image-answer (user_id ?id) (question_id 2) (answer ?a2))
+    (self-image-answer (user_id ?id) (question_id 3) (answer ?a3))
+    (self-image-answer (user_id ?id) (question_id 4) (answer ?a4))
+    (self-image-answer (user_id ?id) (question_id 5) (answer ?a5))
+    (self-image-answer (user_id ?id) (question_id 6) (answer ?a6))
+    (self-image-answer (user_id ?id) (question_id 7) (answer ?a7))
+    (self-image-answer (user_id ?id) (question_id 8) (answer ?a8))
+    (self-image-answer (user_id ?id) (question_id 9) (answer ?a9))
+    (self-image-answer (user_id ?id) (question_id 10) (answer ?a10))
+=>
+    (bind ?score (+ ?a1 
+                    (- 5 ?a2) 
+                    ?a3 
+                    ?a4 
+                    (- 5 ?a5) 
+                    (- 5 ?a6) 
+                    ?a7 
+                    (- 5 ?a8) 
+                    (- 5 ?a9) 
+                    ?a10))
+    
+    ; Determine level based on score
+    (bind ?level (if (< ?score 15) then "low"
+                     else (if (> ?score 25) then "high"
+                             else "moderate")))
+    
+    ; Assert RSES score and level
+    (assert (rses-score 
+        (user_id ?id)
+        (score ?score)
+        (level ?level)))
+        
+    (printout t "RSES Score for user " ?id ": " ?score crlf)
+    (printout t "RSES Level: " ?level crlf))
+
 ; Rules for different combinations
 (defrule trigger-yes-rses-high
 	(declare (salience 90))
-   	(profile-input (user_id ?id))
     (trigger-status (user_id ?id) (has-trigger TRUE))
     (rses-level (user_id ?id) (level "high"))
 =>
@@ -18,7 +59,6 @@
 
 (defrule trigger-yes-rses-low
 	(declare (salience 90))
-	(profile-input (user_id ?id))
     (trigger-status (user_id ?id) (has-trigger TRUE))
     (rses-level (user_id ?id) (level "low"))
 =>
@@ -34,7 +74,6 @@
 
 (defrule trigger-no-rses-high
 	(declare (salience 90))	
-	(profile-input (user_id ?id))
     (trigger-status (user_id ?id) (has-trigger FALSE))
     (rses-level (user_id ?id) (level "high"))
 =>
@@ -50,7 +89,6 @@
 
 (defrule trigger-no-rses-low
 	(declare (salience 90))
-	(profile-input (user_id ?id))
     (trigger-status (user_id ?id) (has-trigger FALSE))
     (rses-level (user_id ?id) (level "low"))
 =>
@@ -67,7 +105,6 @@
 ; Check for moderate RSES and no trigger for second factors
 (defrule check-second-factors
 	(declare (salience 89))
-	(profile-input (user_id ?id))
     (trigger-status (user_id ?id) (has-trigger FALSE))
     (rses-level (user_id ?id) (level "moderate"))
 =>
@@ -79,7 +116,6 @@
 ; Calculate RSES score and categorize it
 (defrule calculate-rses-score
     (declare (salience 91))
-    (profile-input (user_id ?id))
     (not (rses-score (user_id ?id)))  ; Haven't calculated for this user
     (self-image-answer (user_id ?id) (question_id 1) (answer ?a1))
     (self-image-answer (user_id ?id) (question_id 2) (answer ?a2))
@@ -120,7 +156,6 @@
 ; Print recommendation with user_id
 (defrule print-recommendation
     (declare (salience 87))
-    (profile-input (user_id ?id))
     (recommendation (user_id ?id) (message ?m))
     (not (printed-recommendation (user_id ?id)))
 =>
