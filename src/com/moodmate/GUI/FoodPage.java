@@ -47,6 +47,8 @@ public class FoodPage extends BaseHomePage {
             engine.batch("src/com/moodmate/logic/templates.clp");
             engine.batch("src/com/moodmate/logic/food_rules.clp");
             engine.eval("(assert (need-second-factors (user_id 1) (need TRUE)))");
+            engine.eval("(assert (meal-info (user_id 1) (meals-per-day 2)))");
+            
         } catch (JessException ex) {
             ex.printStackTrace();
         }

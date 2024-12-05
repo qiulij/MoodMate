@@ -177,6 +177,10 @@
     (slot option)        ; "3", "2a", "2b", "1a", "1b", "0a", "0b"
     (slot score))        ; calculated score 0-3
 
+(deftemplate food-recommendation
+    (slot user_id)
+    (slot message))
+
 (deftemplate macronutrient-score-calculated
     (slot user_id))
 

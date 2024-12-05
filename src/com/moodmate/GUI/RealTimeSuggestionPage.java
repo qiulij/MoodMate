@@ -4,6 +4,11 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.*;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import jess.*;
 
 public class RealTimeSuggestionPage extends BaseHomePage {
 
@@ -11,15 +16,18 @@ public class RealTimeSuggestionPage extends BaseHomePage {
     private static final int FIELD_HEIGHT = 30; // Height for the input fields
     private static final int PIC_SIZE = 100; // Height for the input fields   
     private static final int MARGIN = 20; // Vertical margin between components
-
+    private static final int userId = 1;
+    private Rete engine; // Add Jess engine as class field
+    
     int contentWidth = contentArea.getWidth();
 
     public RealTimeSuggestionPage() {
         super();
-
+        
+        
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(null); // Absolute positioning
-
+        
         int currentY = 20; // Start Y position for components
 
         // Title Label

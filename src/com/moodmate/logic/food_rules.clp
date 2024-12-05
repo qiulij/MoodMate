@@ -273,3 +273,35 @@
     (printout t "Food Score Analysis for user " ?id ":" crlf)
     (printout t "Final Food Score (Normalized): " ?normalized-score "%" crlf))
 
+; Rule to generate a single focused recommendation
+(defrule generate-food-recommendation
+    (declare (salience 74))  ; Execute after all scores are calculated
+    ?score <- (food-score (user_id ?id)
+                         (total-score ?total)
+                         (appetite-score ?appetite)
+                         (nutrient-score ?nutrient)
+                         (meal-score ?meal))
+    (not (food-recommendation (user_id ?id)))
+=>
+    ; Determine which factor needs the most attention
+    (bind ?message
+        (if (= ?appetite 0)
+            then "Please consult with a healthcare provider about your significant appetite changes. In the meantime, try eating smaller, nutrient-dense meals at regular intervals."
+            else (if (= ?appetite 1)
+                then "Try setting regular meal times and keeping a food diary to help regulate your appetite patterns."
+                else (if (< ?nutrient 50)
+                    then "Focus on incorporating more whole foods, vegetables, and fruits into your diet to improve your overall nutrition."
+                    else (if (< ?meal 50)
+                        then "Work on establishing a more regular meal schedule. Start by planning your meals in advance and eating at consistent times."
+                        else (if (< ?total 75)
+                            then "Your eating patterns are improving. Continue building healthy habits by maintaining regular meal times and choosing nutrient-rich foods."
+                            else "You're maintaining healthy eating patterns. Keep up your consistent schedule and balanced nutrition."))))))
+
+    ; Assert single recommendation
+    (assert (food-recommendation 
+        (user_id ?id)
+        (message ?message)))
+
+    ; Print recommendation
+    (printout t crlf "Food Recommendation:" crlf)
+    (printout t ?message crlf))
