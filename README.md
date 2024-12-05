@@ -37,15 +37,15 @@ A Knowledge-Based Emotion Tracker for Self-Regulation and Early Detection of Men
    git clone https://github.com/qiulij/MoodMate.git
    cd MoodMate
 2. Set Up Required Libraries:
-   Download the following .jar files and add them to your project's classpath:  
+   Download the following .jar files and add them to your project's classpath:  <br />
     * jess.jar
     * jsr94.jar
     * [gson-2.8.8.jar](https://search.maven.org/artifact/com.google.code.gson/gson/2.8.8/jar)
     * [mysql-connector-j-9.1.0.jar](https://dev.mysql.com/downloads/connector/j/?os=26)
 3. Set up Jess: 
-    Download and configure Jess. Add the 'jess.jar file' to your project's classpath.  
+   Download and configure Jess. Add the 'jess.jar file' to your project's classpath.  <br />
 4. Set up MySQL: 
-    Install MySQL Server. Set up the database using the provided SQL scripts (see Database Setup).  
+   Install MySQL Server. Set up the database using the provided SQL scripts (see Database Setup).  <br />
 
 
 ## Database Setup
