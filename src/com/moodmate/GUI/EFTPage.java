@@ -36,7 +36,7 @@ public class EFTPage extends BaseHomePage {
 
         // Title Label
         JLabel titleLabel = new JLabel("Tell me how you feel now", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        titleLabel.setFont(new Font(customFont, Font.BOLD, 20));
         titleLabel.setBounds(PADDING_X, currentY, contentArea.getWidth() - 2 * PADDING_X, FIELD_HEIGHT);
         contentPanel.add(titleLabel);
 
@@ -58,6 +58,10 @@ public class EFTPage extends BaseHomePage {
         nextButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         nextButton.addActionListener(e -> {
+        	 addToNavigationStack();
+             new PrimaryFactorPage();
+             dispose();
+        	
             // Handle navigation to the next page
         });
 
