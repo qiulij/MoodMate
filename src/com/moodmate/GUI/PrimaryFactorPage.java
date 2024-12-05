@@ -3,12 +3,14 @@ package com.moodmate.GUI;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import jess.Fact;
 import jess.JessException;
 import jess.Rete;
 
 import java.awt.*;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class PrimaryFactorPage extends BaseHomePage {
@@ -90,7 +92,7 @@ public class PrimaryFactorPage extends BaseHomePage {
                 Rete engine = new Rete();
                 engine.reset();
                 engine.batch("src/com/moodmate/logic/templates.clp");
-                engine.batch("src/com/moodmate/logic/rules.clp");
+                engine.batch("src/com/moodmate/logic/primary_reason_rules.clp");
 
                 // Assert trigger status
                 boolean hasTrigger = yesButton.isSelected();
@@ -114,6 +116,12 @@ public class PrimaryFactorPage extends BaseHomePage {
                 }
 
                 engine.run();
+                // After engine.run();
+//                Iterator<?> facts = engine.listFacts();
+//                while (facts.hasNext()) {
+//                    Fact fact = (Fact) facts.next();
+//                    System.out.println("Found fact: " + fact.getName());
+//                }
 
                 String message = "<html><body style='width: 150px;'>" +
                         "In this app, we want to help you understand why you are experiencing this feeling.<br>" +
@@ -125,13 +133,31 @@ public class PrimaryFactorPage extends BaseHomePage {
                     JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE,
                     null, options, options[0]);
 
-                if (choice == 1) {
+                if (choice == 0) { // OK selected
+                    try {
+                        // Assert need-second-factors fact
+                        String needFactors = String.format(
+                            "(assert (need-second-factors (user_id %d) (need TRUE)))",
+                            userId
+                        );
+                        System.out.println("Asserting need for second factors: " + needFactors);
+                        engine.eval(needFactors);
+                        engine.run();
+
+                        // Then proceed to next page
+                        addToNavigationStack();
+                        new SleepPage();
+                        dispose();
+                    } catch (JessException ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(this,
+                            "Error processing second factors need: " + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else if (choice == 1) { // Exit selected
                     new HomePage();
-                } else {
-                    addToNavigationStack();
-                    new SleepPage();
+                    dispose();
                 }
-                dispose();
 
             } catch (JessException ex) {
                 ex.printStackTrace();
