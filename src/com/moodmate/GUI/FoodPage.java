@@ -2,8 +2,16 @@ package com.moodmate.GUI;
 
 import javax.swing.*;
 import javax.swing.event.*;
+
+import jess.JessException;
+import jess.Rete;
+
 import java.awt.*;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class FoodPage extends BaseHomePage {
 
@@ -11,11 +19,37 @@ public class FoodPage extends BaseHomePage {
     private static final int FIELD_HEIGHT = 30; // Height for the input fields
     private static final int PIC_SIZE = 100; // Height for the input fields   
     private static final int MARGIN = 20; // Vertical margin between components
-
+    private static final int userId = 1;
+    private Rete engine;
+    private Map<String, JSlider> nutrientSliders = new HashMap<>();
+    
+    private static final Map<String, String> APPETITE_CODES;
+    static {
+        APPETITE_CODES = new LinkedHashMap<>();
+        APPETITE_CODES.put("I have no appetite at all.", "0a");
+        APPETITE_CODES.put("My appetite is much less than before.", "1a");
+        APPETITE_CODES.put("My appetite is somewhat less than usual.", "2a");
+        APPETITE_CODES.put("I have not experienced any change in my appetite.", "3");
+        APPETITE_CODES.put("My appetite is somewhat greater than usual.", "2b");
+        APPETITE_CODES.put("My appetite is much greater than usual.", "1b");
+        APPETITE_CODES.put("I crave food all the time.", "0b");
+    }
+    
+    
     int contentWidth = contentArea.getWidth();
 
     public FoodPage() {
         super();
+        try {
+            // Initialize Jess engine
+            engine = new Rete();
+            engine.reset();
+            engine.batch("src/com/moodmate/logic/templates.clp");
+            engine.batch("src/com/moodmate/logic/food_rules.clp");
+            engine.eval("(assert (need-second-factors (user_id 1) (need TRUE)))");
+        } catch (JessException ex) {
+            ex.printStackTrace();
+        }
 
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(null); // Absolute positioning
@@ -45,7 +79,8 @@ public class FoodPage extends BaseHomePage {
         appetitePanel.setOpaque(false); // No background for the panel
 
         ButtonGroup appetiteGroup = new ButtonGroup(); // Group for radio buttons
-
+        Map<JRadioButton, String> buttonToCode = new HashMap<>();
+        
         String[] appetiteOptions = {
             "I have no appetite at all.",
             "My appetite is much less than before.",
@@ -56,12 +91,28 @@ public class FoodPage extends BaseHomePage {
             "I crave food all the time."
         };
 
-        for (String option : appetiteOptions) {
-            JRadioButton radioButton = new JRadioButton(option);
+        for (Map.Entry<String, String> option : APPETITE_CODES.entrySet()) {
+            JRadioButton radioButton = new JRadioButton(option.getKey());
             radioButton.setFont(new Font(customFont, Font.PLAIN, 14));
-            radioButton.setOpaque(false); // No background for the button
+            radioButton.setOpaque(false);
             appetiteGroup.add(radioButton);
             appetitePanel.add(radioButton);
+            buttonToCode.put(radioButton, option.getValue());
+
+            // Add action listener to assert fact when option is selected
+            radioButton.addActionListener(e -> {
+                try {
+                    String appetiteCommand = String.format(
+                        "(assert (appetite-status (user_id %d) (option \"%s\")))",
+                        userId, option.getValue()
+                    );
+                    System.out.println("Asserting appetite: " + appetiteCommand);
+                    engine.eval(appetiteCommand);
+                    engine.run();
+                } catch (JessException ex) {
+                    ex.printStackTrace();
+                }
+            });
         }
 
         // Add the panel to the content panel
@@ -78,8 +129,6 @@ public class FoodPage extends BaseHomePage {
 
 
         // Macronutrient Sliders
- 
-     
 
         String[] categories = {"Carbs", "Protein", "Fat", "Minerals", "Vitamins", "Water"};
         String[] icons = {"carbs.png", "protein.png", "fat.png", "minerals.png", "vitamins.png", "water.png"};
@@ -120,6 +169,7 @@ public class FoodPage extends BaseHomePage {
 
             slider.setLabelTable(labelTable);
 
+            nutrientSliders.put(categories[i], slider);
             container.add(slider);
 
             // Add container to content panel
@@ -140,10 +190,64 @@ public class FoodPage extends BaseHomePage {
         nextButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         nextButton.addActionListener(e -> {
-            addToNavigationStack();
-            new RealTimeSuggestionPage();
-            dispose();
+            try {
+                // Validate appetite selection
+                if (appetiteGroup.getSelection() == null) {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Please select your appetite status.",
+                        "Input Required",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                    return;
+                }
+
+                // Assert macronutrient intake
+                String macroCommand = String.format(
+                    "(assert (macronutrient-intake " +
+                    "(user_id %d) " +
+                    "(carbs %d) " +
+                    "(protein %d) " +
+                    "(fat %d) " +
+                    "(minerals %d) " +
+                    "(vitamins %d) " +
+                    "(water %d)))",
+                    userId,
+                    nutrientSliders.get("Carbs").getValue(),    
+                    nutrientSliders.get("Protein").getValue(),
+                    nutrientSliders.get("Fat").getValue(),
+                    nutrientSliders.get("Minerals").getValue(),
+                    nutrientSliders.get("Vitamins").getValue(),
+                    nutrientSliders.get("Water").getValue()
+                );
+
+                System.out.println("Asserting macronutrients: " + macroCommand);
+                engine.eval(macroCommand);
+                engine.run();
+
+                // Print all facts for debugging
+//                System.out.println("\nAll facts after assertion:");
+//                Iterator<?> facts = engine.listFacts();
+//                while (facts.hasNext()) {
+//                    System.out.println(facts.next());
+//                }
+
+                // Continue to next page
+                addToNavigationStack();
+                new RealTimeSuggestionPage();
+                dispose();
+
+            } catch (JessException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Error processing nutrition data: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
         });
+
 
         contentPanel.add(nextButton);
         currentY += FIELD_HEIGHT + MARGIN;
