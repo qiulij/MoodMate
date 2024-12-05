@@ -20,7 +20,6 @@ public class FoodPage extends BaseHomePage {
     private static final int PIC_SIZE = 100; // Height for the input fields   
     private static final int MARGIN = 20; // Vertical margin between components
     private static final int userId = 1;
-    private Rete engine;
     private Map<String, JSlider> nutrientSliders = new HashMap<>();
     
     private static final Map<String, String> APPETITE_CODES;
@@ -40,18 +39,7 @@ public class FoodPage extends BaseHomePage {
 
     public FoodPage() {
         super();
-        try {
-            // Initialize Jess engine
-            engine = new Rete();
-            engine.reset();
-            engine.batch("src/com/moodmate/logic/templates.clp");
-            engine.batch("src/com/moodmate/logic/food_rules.clp");
-            engine.eval("(assert (need-second-factors (user_id 1) (need TRUE)))");
-            engine.eval("(assert (meal-info (user_id 1) (meals-per-day 2)))");
-            
-        } catch (JessException ex) {
-            ex.printStackTrace();
-        }
+        Rete engine = ReteEngineManager.getInstance();
 
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(null); // Absolute positioning

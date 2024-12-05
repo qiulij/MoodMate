@@ -89,10 +89,7 @@ public class PrimaryFactorPage extends BaseHomePage {
 
             try {
                 // Initialize Jess engine
-                Rete engine = new Rete();
-                engine.reset();
-                engine.batch("src/com/moodmate/logic/templates.clp");
-                engine.batch("src/com/moodmate/logic/primary_reason_rules.clp");
+            	Rete engine = ReteEngineManager.getInstance();
 
                 // Assert trigger status
                 boolean hasTrigger = yesButton.isSelected();
@@ -117,11 +114,11 @@ public class PrimaryFactorPage extends BaseHomePage {
 
                 engine.run();
                 // After engine.run();
-//                Iterator<?> facts = engine.listFacts();
-//                while (facts.hasNext()) {
-//                    Fact fact = (Fact) facts.next();
-//                    System.out.println("Found fact: " + fact.getName());
-//                }
+                Iterator<?> facts = engine.listFacts();
+                while (facts.hasNext()) {
+                    Fact fact = (Fact) facts.next();
+                    System.out.println("Found fact: " + fact.getName());
+                }
 
                 String message = "<html><body style='width: 150px;'>" +
                         "In this app, we want to help you understand why you are experiencing this feeling.<br>" +

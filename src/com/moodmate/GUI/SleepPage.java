@@ -10,7 +10,6 @@ import java.awt.*;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import jess.*;
 
 public class SleepPage extends BaseHomePage {
 
@@ -18,20 +17,10 @@ public class SleepPage extends BaseHomePage {
     private static final int FIELD_HEIGHT = 30; // Height for input fields
     private static final int MARGIN = 10; // Vertical margin between components
     private static final int userId = 1;
-    private Rete engine;
     
     public SleepPage() {
         super();
-        try {
-            // Initialize Jess engine once at page creation
-            engine = new Rete();
-            engine.reset();
-            engine.batch("src/com/moodmate/logic/templates.clp");
-            engine.batch("src/com/moodmate/logic/sleep_rules.clp");
-            engine.eval("(assert (need-second-factors (user_id 1) (need TRUE)))");
-        } catch (JessException ex) {
-            ex.printStackTrace();
-        }
+        Rete engine = ReteEngineManager.getInstance();
         
         // Set the background of the page to an image
         JPanel contentPanel = new JPanel();

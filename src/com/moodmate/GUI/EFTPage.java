@@ -71,10 +71,7 @@ public class EFTPage extends BaseHomePage {
         nextButton.addActionListener(e -> {
             try {
                 // Initialize Jess engine
-                Rete engine = new Rete();
-                engine.reset();
-                engine.batch("src/com/moodmate/logic/templates.clp");
-                engine.batch("src/com/moodmate/logic/EFT_rules.clp");
+            	 Rete engine = ReteEngineManager.getInstance();
 
                 // Assert each emotion's intensity
                 for (String emotion : emotionAdj.keySet()) {

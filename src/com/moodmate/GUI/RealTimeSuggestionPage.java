@@ -1,12 +1,11 @@
 package com.moodmate.GUI;
 
 import javax.swing.*;
-import javax.swing.event.*;
 import java.awt.*;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import jess.*;
 
@@ -17,13 +16,13 @@ public class RealTimeSuggestionPage extends BaseHomePage {
     private static final int PIC_SIZE = 100; // Height for the input fields   
     private static final int MARGIN = 20; // Vertical margin between components
     private static final int userId = 1;
-    private Rete engine; // Add Jess engine as class field
+
     
     int contentWidth = contentArea.getWidth();
 
     public RealTimeSuggestionPage() {
         super();
-        
+        Rete engine = ReteEngineManager.getInstance();
         
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(null); // Absolute positioning
@@ -38,54 +37,59 @@ public class RealTimeSuggestionPage extends BaseHomePage {
 
         currentY += FIELD_HEIGHT + MARGIN;
 
+     // Icon mapping for different recommendation types
+        HashMap<String, String> templateIcons = new HashMap<>();
+        templateIcons.put("recommendation", "self-image.png");
+        templateIcons.put("sleep-recommendation", "sleep.png");
+        templateIcons.put("physical-activity-recommendation", "physical_activity.png");
+        templateIcons.put("food-recommendation", "food.png");
 
-        JLabel title2Label = new JLabel("Monitor Your Nutrition", SwingConstants.CENTER);
-        title2Label.setFont(new Font(customFont, Font.BOLD, 20));
-        title2Label.setBounds(PADDING_X, currentY, contentWidth - 2 * PADDING_X, FIELD_HEIGHT);
-        contentPanel.add(title2Label);
 
-        currentY += FIELD_HEIGHT + MARGIN;
+        try {
+            // Define the list of templates to retrieve recommendations from
+            List<String> templates = Arrays.asList(
+                "recommendation",
+                "sleep-recommendation",
+                "physical-activity-recommendation",
+                "food-recommendation"
+            );
 
+            // Retrieve and display recommendations for each template
+            for (String template : templates) {
+                List<String> recommendations = getRecommendations(engine, template);
+                for (String recommendation : recommendations) {
+                    JPanel container = new JPanel();
+                    container.setLayout(null);
+                    container.setBounds(PADDING_X, currentY, contentWidth - 2 * PADDING_X, PIC_SIZE + FIELD_HEIGHT + 10);
 
-        // Macronutrient Sliders
- 
-     
+                    // Icon for the recommendation type
+                    String iconPath = "assets/images/suggestions/" + templateIcons.getOrDefault(template, "default.png");
+                    JLabel iconLabel = new JLabel(new ImageIcon(iconPath));
+                    iconLabel.setBounds(0, 0, PIC_SIZE, PIC_SIZE);
+                    container.add(iconLabel);
 
-        String[] suggestionsText = {
-            "Prepare and enjoy a balanced meal to nourish your body and mind.",
-            "Do a quick stretch or light exercise to energize your body.",
-            "Look in the mirror and remind yourself of something you like about yourself.",
-            "Take a short power nap or create a cozy environment for better sleep.",
-            "Step outside to enjoy the fresh air or take a moment to appreciate the current weather."
-        };
-        String[] suggestionIcons = {
-            "food.png", "physical_activity.png", "self_image.png", "sleep.png", "weather.png",
-        };
+                    // Text Label for recommendation
+                    JLabel textLabel = new JLabel("<html>" + recommendation + "</html>");
+                    textLabel.setFont(new Font(customFont, Font.PLAIN, 16));
+                    textLabel.setBounds(PIC_SIZE + 10, 0, contentWidth - PIC_SIZE - PADDING_X * 2, PIC_SIZE);
+                    container.add(textLabel);
 
-      
-        for (int i = 0; i < suggestionsText.length; i++) {
-            // Container Panel
-            JPanel container = new JPanel();
-            container.setLayout(null);
-            container.setBounds(PADDING_X, currentY, contentWidth - 2 * PADDING_X, PIC_SIZE + FIELD_HEIGHT + 10);
+                    // Add container to content panel
+                    contentPanel.add(container);
+                    currentY += PIC_SIZE + FIELD_HEIGHT + MARGIN;
+                }
+            }
 
-            // Icon Label;
-            String path =  "assets/images/suggestions/" + suggestionIcons[i];
-            JLabel iconLabel = new JLabel(new ImageIcon(path));
-            iconLabel.setBounds(0, 0, PIC_SIZE, PIC_SIZE);
-            container.add(iconLabel);
-
-            JLabel textLabel = new JLabel("<html>" + suggestionsText[i] + "</html>");
-            textLabel.setFont(new Font(customFont, Font.PLAIN, 16));
-            textLabel.setBounds(PIC_SIZE + 10, 0, contentWidth - PIC_SIZE - PADDING_X * 2, PIC_SIZE );
-            container.add(textLabel);
-       
-            // Add container to content panel
-            contentPanel.add(container);
-
-            currentY += PIC_SIZE + FIELD_HEIGHT + MARGIN;
+        } catch (JessException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(
+                this,
+                "Error retrieving recommendations: " + ex.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+            );
         }
-
+     
 
         currentY += MARGIN;
 
@@ -103,6 +107,7 @@ public class RealTimeSuggestionPage extends BaseHomePage {
             dispose();
         });
 
+
         contentPanel.add(nextButton);
         currentY += FIELD_HEIGHT + MARGIN;
 
@@ -113,7 +118,21 @@ public class RealTimeSuggestionPage extends BaseHomePage {
         contentArea.add(scrollPane, BorderLayout.CENTER);
     }
 
-   
+    private List<String> getRecommendations(Rete engine, String templateName) throws JessException {
+        List<String> recommendations = new ArrayList<>();
+        Iterator<?> facts = engine.listFacts();
+
+        while (facts.hasNext()) {
+            Fact fact = (Fact) facts.next();
+            if (fact.getName().equalsIgnoreCase("MAIN::" + templateName)) {
+                // Retrieve the message slot
+                String message = fact.getSlotValue("message").stringValue(null);
+                recommendations.add(message);
+            }
+        }
+
+        return recommendations;
+    }
 
     public static void main(String[] args) {
         new RealTimeSuggestionPage();
