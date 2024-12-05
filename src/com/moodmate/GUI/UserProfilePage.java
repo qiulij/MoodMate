@@ -3,6 +3,9 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.NumberFormatter;
 
+import com.moodmate.GUI.SignInPage.GlobalVariable;
+
+import jess.*;
 import java.awt.*;
 import java.text.NumberFormat;
 import java.util.Hashtable;
@@ -189,6 +192,23 @@ public class UserProfilePage extends BasePage {
                     JOptionPane.WARNING_MESSAGE
                 );
             } else {
+                	try {
+                		Rete engine = new Rete();
+                		
+                		engine.reset();
+                        engine.batch("src/com/moodmate/logic/templates.clp");
+                        engine.batch("src/com/moodmate/logic/user_profile_rules.clp");
+                        
+                        Fact userInput = new Fact("profile-input", engine);
+                        userInput.setSlotValue("user_id", new Value( GlobalVariable.userId, RU.INTEGER));
+                        userInput.setSlotValue("name", new Value(username, RU.STRING));
+                        userInput.setSlotValue("gender", new Value(gender, RU.INTEGER));
+                        userInput.setSlotValue("age", new Value(age, RU.INTEGER));
+                        engine.assertFact(userInput);
+                        engine.run();
+                        
+                        
+                	}catch(JessException ex) {ex.printStackTrace();}
                 addToNavigationStack();
 
                 // Pass data to MbtiTestPage
@@ -257,7 +277,6 @@ public class UserProfilePage extends BasePage {
                 );
             } else {
                 String mbtiResult = calculateMBTI();
-                addToNavigationStack();
                 new HobbiesPage(username, age, gender, mbtiResult);
                 dispose();
             }
@@ -283,6 +302,7 @@ public class UserProfilePage extends BasePage {
         labels.put(100, new JLabel(label100));
         mbtiSlider.setLabelTable(labels);  
         mbtiSlider.setPaintLabels(true);
+        
 
         // Store the slider reference
         if (label0.contains("Introvert")) {

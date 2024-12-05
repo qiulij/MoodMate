@@ -2,8 +2,9 @@ package com.moodmate.GUI;
 
 import javax.swing.*;
 
-import jess.JessException;
-import jess.Rete;
+import com.moodmate.GUI.SignInPage.GlobalVariable;
+
+import jess.*;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -144,9 +145,9 @@ public class HobbiesPage extends BasePage {
                     
                     // Create new fact with all information
                     String assertCommand = String.format(
-                    	    "(assert (profile-input (user_id 1) (name \"%s\") (gender %d) " +
+                    	    "(assert (profile-input (user_id %d) (name \"%s\") (gender %d) " +
                     	    "(age %d) (mbti \"%s\") (hobbies \"%s\") (notification-frequency 1)))",
-                    	    username, gender, age, mbtiResult, hobbiesStr
+                    	    GlobalVariable.userId, username, gender, age, mbtiResult, hobbiesStr
                     	);
                     
                     // Debug print
@@ -157,7 +158,7 @@ public class HobbiesPage extends BasePage {
 
                     // Proceed to next page
                     addToNavigationStack();
-                    new NotificationSettingPage(username, age, gender, mbtiResult, hobbiesStr);
+                    new NotificationSettingPage(GlobalVariable.userId,username, age, gender, mbtiResult, hobbiesStr);
                     dispose();
 
                 } catch (JessException ex) {

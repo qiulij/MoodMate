@@ -2,6 +2,8 @@ package com.moodmate.GUI;
 
 import jess.*;
 import javax.swing.*;
+
+import com.moodmate.GUI.SignInPage.GlobalVariable;
 import com.moodmate.database.DatabaseConnection;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
@@ -85,7 +87,17 @@ public class SignUpPage extends BasePage {
                     "Invalid Username",
                     JOptionPane.WARNING_MESSAGE
                 );
-            } else {
+            } else{
+                // Check if the username already exists
+                boolean usernameExists = DatabaseConnection.usernameExists(username);
+                if (usernameExists) {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "This username is already taken. Please choose a different one.",
+                        "Username Exists",
+                        JOptionPane.WARNING_MESSAGE
+                    );}
+                else {
                 try {
                     Rete engine = new Rete();
                     engine.reset();
@@ -136,6 +148,8 @@ public class SignUpPage extends BasePage {
                                 "Registration Success",
                                 JOptionPane.INFORMATION_MESSAGE
                             );
+                            GlobalVariable.userId = DatabaseConnection.getUserIdByUsername(username);
+                            System.out.println("User ID for username '" + username + "': " + GlobalVariable.userId);
                             addToNavigationStack();
                             new UserProfilePage();
                             dispose();
@@ -158,7 +172,7 @@ public class SignUpPage extends BasePage {
                     );
                 }
             }
-        });
+        }});
 
         backgroundLabel.add(signUpButton);
     }
