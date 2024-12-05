@@ -52,7 +52,7 @@ A Knowledge-Based Emotion Tracker for Self-Regulation and Early Detection of Men
 
 
 ## Database Setup
-    Run the SQL Scripts in MySQL
+Run the SQL Scripts in MySQL
     ```bash
     -- Authentication table
     CREATE TABLE IF NOT EXISTS Authentication (
