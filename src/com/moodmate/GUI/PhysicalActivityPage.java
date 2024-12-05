@@ -2,6 +2,10 @@ package com.moodmate.GUI;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import jess.JessException;
+import jess.Rete;
+
 import java.awt.*;
 
 public class PhysicalActivityPage extends BaseHomePage {
@@ -9,10 +13,22 @@ public class PhysicalActivityPage extends BaseHomePage {
     private static final int PADDING_X = 40; // Horizontal padding for fields
     private static final int FIELD_HEIGHT = 30; // Height for input fields
     private static final int MARGIN = 10; // Vertical margin between components
-
+    private static final int userId = 1;
+    private Rete engine; // Add Jess engine as class field
+    
     public PhysicalActivityPage() {
         super();
-
+        try {
+            // Initialize Jess engine once at page creation
+            engine = new Rete();
+            engine.reset();
+            engine.batch("src/com/moodmate/logic/templates.clp");
+            engine.batch("src/com/moodmate/logic/physical_activity_rules.clp");
+            engine.eval("(assert (need-second-factors (user_id 1) (need TRUE)))");
+            
+        } catch (JessException ex) {
+            ex.printStackTrace();
+        }
         // Set the background of the page to an image
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(null); // Absolute positioning
@@ -101,8 +117,54 @@ public class PhysicalActivityPage extends BaseHomePage {
         contentPanel.add(activityDetailsPanel);
 
         // Listener for "Yes" button to show details panel
-        yesButton.addActionListener(e -> activityDetailsPanel.setVisible(true));
-        noButton.addActionListener(e -> activityDetailsPanel.setVisible(false));
+        yesButton.addActionListener(e -> {
+            try {
+                // Assert activity fact
+                String activityCommand = String.format(
+                    "(assert (activity (user_id %d) (has-activity TRUE)))",
+                    userId
+                );
+                System.out.println("Asserting activity: " + activityCommand);
+                engine.eval(activityCommand);
+                engine.run();
+
+                // Show details panel
+                activityDetailsPanel.setVisible(true);
+
+            } catch (JessException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Error processing activity status: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
+        noButton.addActionListener(e -> {
+            try {
+                // Assert activity fact with FALSE
+                String activityCommand = String.format(
+                    "(assert (activity (user_id %d) (has-activity FALSE)))",
+                    userId
+                );
+                System.out.println("Asserting activity: " + activityCommand);
+                engine.eval(activityCommand);
+                engine.run();
+
+                // Hide details panel
+                activityDetailsPanel.setVisible(false);
+
+            } catch (JessException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Error processing activity status: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
 
         currentY += activityDetailsPanel.getHeight() + MARGIN;
 
@@ -116,11 +178,70 @@ public class PhysicalActivityPage extends BaseHomePage {
         nextButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         nextButton.addActionListener(e -> {
-            addToNavigationStack();
-            new FoodPage();
-            dispose();
-        });
+            try {
+                // Validate input
+                if (!yesButton.isSelected() && !noButton.isSelected()) {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Please indicate if you engaged in physical activity.",
+                        "Input Required",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                    return;
+                }
 
+                if (yesButton.isSelected()) {
+                    if (!lightIntensityButton.isSelected() && 
+                        !moderateIntensityButton.isSelected() && 
+                        !highIntensityButton.isSelected()) {
+                        JOptionPane.showMessageDialog(
+                            this,
+                            "Please select activity intensity level.",
+                            "Input Required",
+                            JOptionPane.WARNING_MESSAGE
+                        );
+                        return;
+                    }
+
+                    // Get intensity level
+                    String intensity;
+                    if (lightIntensityButton.isSelected()) intensity = "light";
+                    else if (moderateIntensityButton.isSelected()) intensity = "moderate";
+                    else intensity = "high";
+
+                    // Get duration
+                    int duration = (Integer) durationSpinner.getValue();
+
+                    // Assert physical activity fact
+                    String physicalActivityCommand = String.format(
+                        "(assert (physical-activity " +
+                        "(user_id %d) " +
+                        "(has-activity TRUE) " +
+                        "(duration %d) " +
+                        "(intensity \"%s\")))",
+                        userId, duration, intensity
+                    );
+
+                    System.out.println("Asserting physical activity: " + physicalActivityCommand);
+                    engine.eval(physicalActivityCommand);
+                    engine.run();
+                }
+
+                // Continue to next page
+                addToNavigationStack();
+                new FoodPage();
+                dispose();
+
+            } catch (JessException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Error processing physical activity data: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
         contentPanel.add(nextButton);
 
         contentPanel.setPreferredSize(new Dimension(contentArea.getWidth(), currentY + FIELD_HEIGHT + 40));
