@@ -1,7 +1,7 @@
 ; Rule to calculate appetite score
 (defrule calculate-appetite-score
     (declare (salience 78))
-    (need-second-factors (user_id ?id) (need TRUE))
+
     ?appetite <- (appetite-status (user_id ?id) (option ?opt))
     (not (appetite-score-calculated (user_id ?id)))  ; Only calculate once
 =>
@@ -23,18 +23,18 @@
     
     ; Assert recommendation based on score
     (if (= ?score 3)
-        then (assert (appetite-recommendation 
+        then (assert (food-recommendation 
                 (user_id ?id)
                 (message "Your appetite is stable, which is good for maintaining healthy eating patterns.")))
         else (if (= ?score 2)
-                then (assert (appetite-recommendation 
+                then (assert (food-recommendation 
                         (user_id ?id)
                         (message "Your appetite has changed slightly. Monitor your eating patterns and try to maintain regular meal times.")))
                 else (if (= ?score 1)
-                        then (assert (appetite-recommendation 
+                        then (assert (food-recommendation 
                                 (user_id ?id)
                                 (message "Significant changes in appetite can affect your well-being. Consider consulting a healthcare provider.")))
-                        else (assert (appetite-recommendation 
+                        else (assert (food-recommendation 
                                 (user_id ?id)
                                 (message "Your appetite patterns are concerning. Please speak with a healthcare provider about your eating patterns."))))))
                                 
@@ -44,7 +44,7 @@
 ; Rule to calculate macronutrient score
 (defrule calculate-macronutrient-score
     (declare (salience 77))
-    (need-second-factors (user_id ?id) (need TRUE))
+
     ?intake <- (macronutrient-intake (user_id ?id)
                                     (carbs ?c)      
                                     (protein ?p)    
@@ -138,56 +138,46 @@
     (assert (macronutrient-score-calculated (user_id ?id)))
     (modify ?intake (score ?total-score))
     
-    ; Print analysis
-(printout t "Nutrient Analysis:" crlf)
-(printout t "Carbohydrates: " 
-    (if (< ?c 40) 
-        then "Currently low - Try to include more whole grains, fruits, and starchy vegetables in your meals for sustained energy"
-        else (if (> ?c 60) 
-                then "Higher than needed - Consider reducing portions of rice, bread, and other starchy foods"
-                else "Good balance - Keep maintaining this level of carbohydrate intake")) crlf)
+   ; Assert analysis as food-recommendation facts
+    (if (< ?c 40)
+        then (assert (food-recommendation (user_id ?id) (message "Carbohydrates are currently low. Try to include more whole grains, fruits, and starchy vegetables in your meals for sustained energy."))))
+    (if (> ?c 60)
+        then (assert (food-recommendation (user_id ?id) (message "Carbohydrates are higher than needed. Consider reducing portions of rice, bread, and other starchy foods."))))
 
-(printout t "Protein: " 
-    (if (< ?p 40) 
-        then "Currently low - Include more lean meats, fish, eggs, tofu, or legumes to support your body's needs"
-        else (if (> ?p 60) 
-                then "Higher than needed - Consider moderating your protein portions while maintaining variety"
-                else "Good balance - You're getting a healthy amount of protein")) crlf)
+    (if (< ?p 40)
+        then (assert (food-recommendation (user_id ?id) (message "Protein intake is low. Include more lean meats, fish, eggs, tofu, or legumes to support your body's needs."))))
+    (if (> ?p 60)
+        then (assert (food-recommendation (user_id ?id) (message "Protein intake is higher than needed. Consider moderating your protein portions while maintaining variety."))))
 
-(printout t "Fat: " 
-    (if (< ?f 40) 
-        then "Currently low - Try adding healthy fats like avocados, nuts, olive oil, or fatty fish to your diet"
-        else (if (> ?f 60) 
-                then "Higher than needed - Consider reducing portions of high-fat foods while keeping healthy fats in your diet"
-                else "Good balance - You're maintaining a healthy fat intake")) crlf)
+    (if (< ?f 40)
+        then (assert (food-recommendation (user_id ?id) (message "Fat intake is low. Add healthy fats like avocados, nuts, olive oil, or fatty fish to your diet."))))
+    (if (> ?f 60)
+        then (assert (food-recommendation (user_id ?id) (message "Fat intake is higher than needed. Reduce portions of high-fat foods while keeping healthy fats in your diet."))))
 
-(printout t "Water: " 
-    (if (< ?w 40) 
-        then "Currently low - Try carrying a water bottle, setting reminders to drink, or eating more water-rich foods"
-        else (if (> ?w 60) 
-                then "Higher than needed - While staying hydrated is good, excessive water intake isn't necessary"
-                else "Good balance - You're maintaining good hydration habits")) crlf)
+    (if (< ?w 40)
+        then (assert (food-recommendation (user_id ?id) (message "Water intake is low. Try carrying a water bottle or eating more water-rich foods."))))
+    (if (> ?w 60)
+        then (assert (food-recommendation (user_id ?id) (message "Water intake is higher than needed. Excessive water intake isn't necessary."))))
 
-(printout t "Minerals: " 
-    (if (< ?m 40) 
-        then "Currently low - Include more leafy greens, nuts, seeds, and whole grains for better mineral intake"
-        else (if (> ?m 60) 
-                then "Higher than needed - If you're taking supplements, consider reviewing them with a healthcare provider"
-                else "Good balance - You're getting a good variety of minerals")) crlf)
+    (if (< ?m 40)
+        then (assert (food-recommendation (user_id ?id) (message "Mineral intake is low. Include more leafy greens, nuts, seeds, and whole grains."))))
+    (if (> ?m 60)
+        then (assert (food-recommendation (user_id ?id) (message "Mineral intake is higher than needed. If you're taking supplements, consider reviewing them with a healthcare provider."))))
 
-(printout t "Vitamins: " 
-    (if (< ?v 40) 
-        then "Currently low - Try adding more colorful fruits and vegetables to increase your vitamin intake"
-        else (if (> ?v 60) 
-                then "Higher than needed - If you're taking supplements, consider reviewing your intake with a healthcare provider"
-                else "Good balance - You're getting a good mix of vitamins from your diet")) crlf)
+    (if (< ?v 40)
+        then (assert (food-recommendation (user_id ?id) (message "Vitamin intake is low. Add more colorful fruits and vegetables to your diet."))))
+    (if (> ?v 60)
+        then (assert (food-recommendation (user_id ?id) (message "Vitamin intake is higher than needed. Review supplement intake with a healthcare provider."))))
 
-(printout t crlf "Final Nutrition Score: " ?total-score "%" crlf))
+    ; Assert the final nutrition score
+    (assert (food-recommendation (user_id ?id) (message (str-cat "Final Nutrition Score: " ?total-score "%."))))
+)
+
 
 ; Rule to evaluate meal patterns
 (defrule evaluate-meal-patterns
     (declare (salience 76))  ; After macronutrient evaluation
-    (need-second-factors (user_id ?id) (need TRUE))
+
     ?meal <- (meal-info (user_id ?id) (meals-per-day ?m))
     (not (meal-pattern-evaluated (user_id ?id)))
 =>
@@ -248,7 +238,7 @@
     (printout t "Meal Pattern Score: " ?meal-score "%" crlf))
 
 (defrule calculate-food-score
-    (declare (salience 75))
+   	(declare (salience 70))
     ?meal <- (meal-info (user_id ?id) (meal-score ?meal-score))
     ?appetite <- (appetite-status (user_id ?id) (score ?appetite-score))
     ?nutrient <- (macronutrient-intake (user_id ?id) (score ?nutrient-score))
@@ -281,27 +271,41 @@
                          (appetite-score ?appetite)
                          (nutrient-score ?nutrient)
                          (meal-score ?meal))
-    (not (food-recommendation (user_id ?id)))
+    (not (food-recommendation (user_id ?id)))  ; Ensure recommendation is generated only once
 =>
-    ; Determine which factor needs the most attention
-    (bind ?message
-        (if (= ?appetite 0)
-            then "Please consult with a healthcare provider about your significant appetite changes. In the meantime, try eating smaller, nutrient-dense meals at regular intervals."
-            else (if (= ?appetite 1)
-                then "Try setting regular meal times and keeping a food diary to help regulate your appetite patterns."
-                else (if (< ?nutrient 50)
-                    then "Focus on incorporating more whole foods, vegetables, and fruits into your diet to improve your overall nutrition."
-                    else (if (< ?meal 50)
-                        then "Work on establishing a more regular meal schedule. Start by planning your meals in advance and eating at consistent times."
-                        else (if (< ?total 75)
-                            then "Your eating patterns are improving. Continue building healthy habits by maintaining regular meal times and choosing nutrient-rich foods."
-                            else "You're maintaining healthy eating patterns. Keep up your consistent schedule and balanced nutrition."))))))
+    ; Initialize the message with an empty string
+    (bind ?messages "")
 
-    ; Assert single recommendation
+    ; Add appetite-based recommendations
+    (if (= ?appetite 0)
+        then (bind ?messages (str-cat ?messages
+            "Your appetite patterns are concerning. Please consult with a healthcare provider about significant appetite changes.\n"))
+        else (if (= ?appetite 1)
+                then (bind ?messages (str-cat ?messages
+                    "Try setting regular meal times and keeping a food diary to help regulate your appetite patterns.\n"))))
+
+    ; Add nutrient-based recommendations
+    (if (< ?nutrient 50)
+        then (bind ?messages (str-cat ?messages
+            "Focus on incorporating more whole foods, vegetables, and fruits into your diet to improve your overall nutrition.\n")))
+
+    ; Add meal pattern-based recommendations
+    (if (< ?meal 50)
+        then (bind ?messages (str-cat ?messages
+            "Work on establishing a more regular meal schedule. Start by planning your meals in advance and eating at consistent times.\n")))
+
+    ; Add overall suggestions based on total score
+    (if (< ?total 75)
+        then (bind ?messages (str-cat ?messages
+            "Your eating patterns are improving. Continue building healthy habits by maintaining regular meal times and choosing nutrient-rich foods.\n"))
+        else (bind ?messages (str-cat ?messages
+            "You're maintaining healthy eating patterns. Keep up your consistent schedule and balanced nutrition.\n")))
+
+    ; Assert a comprehensive food recommendation fact
     (assert (food-recommendation 
         (user_id ?id)
-        (message ?message)))
+        (message ?messages)))
 
-    ; Print recommendation
+    ; Print the comprehensive recommendation
     (printout t crlf "Food Recommendation:" crlf)
-    (printout t ?message crlf))
+    (printout t ?messages crlf))

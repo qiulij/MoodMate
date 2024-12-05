@@ -98,7 +98,11 @@ public class FoodPage extends BaseHomePage {
                     );
                     System.out.println("Asserting appetite: " + appetiteCommand);
                     engine.eval(appetiteCommand);
+                    engine.eval("(assert (meal-info (user_id 1) (meals-per-day 2)))");
+ 
                     engine.run();
+                   
+
                 } catch (JessException ex) {
                     ex.printStackTrace();
                 }
@@ -214,6 +218,11 @@ public class FoodPage extends BaseHomePage {
                 System.out.println("Asserting macronutrients: " + macroCommand);
                 engine.eval(macroCommand);
                 engine.run();
+                Iterator<?> facts = engine.listFacts();
+                System.out.println("Facts in the engine:");
+                while (facts.hasNext()) {
+                    System.out.println(facts.next());
+                }
 
                 // Print all facts for debugging
 //                System.out.println("\nAll facts after assertion:");
